@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.0.5]
+
 ### Added
  - Common functions for deletion and getting resources
 
