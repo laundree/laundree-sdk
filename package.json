@@ -1,6 +1,6 @@
 {
   "name": "laundree-sdk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "An sdk for laundree.io",
   "main": "index.js",
   "scripts": {
