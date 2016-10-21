@@ -1,0 +1,6 @@
+language: node
+
+cache:
+  directories:
+    - node_modules
+

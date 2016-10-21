@@ -1,0 +1,35 @@
+{
+  "name": "laundree-sdk",
+  "version": "0.0.1",
+  "description": "An sdk for laundree.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laundree/laundree-sdk.git"
+  },
+  "keywords": [
+    "Laundree",
+    "sdk"
+  ],
+  "author": "Christian Budde Christensen <budde377@gmail.com>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/laundree/laundree-sdk/issues"
+  },
+  "homepage": "https://github.com/laundree/laundree-sdk#readme",
+  "dependencies": {
+    "promis": "^1.1.4",
+    "promise": "^7.1.1",
+    "superagent": "^2.3.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.0.0",
+    "eslint": "^3.8.1",
+    "eslint-config-standard": "^6.0.0",
+    "eslint-plugin-promise": "^3.0.0",
+    "eslint-plugin-standard": "^2.0.0"
+  }
+}
