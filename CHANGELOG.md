@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [0.0.7]
+
+### Fixed
+ - Bugs when constructing laundry SDK
+
+### Changed
+ - Update user method
+
 ## [0.0.5]
 
 ### Added
