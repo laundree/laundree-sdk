@@ -135,13 +135,27 @@ class Sdk {
 }
 
 class ResourceSdk {
-  constructor (baseUrl = '', id = '') {
+  constructor (resourcePath, baseUrl = '', id = '') {
+    this.resourcePath = resourcePath
     this.id = id
     this.baseUrl = baseUrl
+  }
+
+  get () {
+    return get(`${this.baseUrl}/api/${this.resourcePath}/${this.id}`).then(({body}) => body)
+  }
+
+  del () {
+    return del(`${this.baseUrl}/api/${this.resourcePath}/${this.id}`)
   }
 }
 
 class UserSdk extends ResourceSdk {
+
+  constructor (baseUrl, id) {
+    super('users', baseUrl, id)
+  }
+
   fromEmail (email) {
     return get(`${this.baseUrl}/api/users?email=${encodeURIComponent(email)}`)
       .then(({ body }) => {
@@ -210,15 +224,12 @@ class UserSdk extends ResourceSdk {
     return post(`${this.baseUrl}/api/users/${this.id}/start-email-verification`, { email })
   }
 
-  deleteUser () {
-    return del(`${this.baseUrl}/api/users/${this.id}`)
-  }
 }
 
 class MachineSdk extends ResourceSdk {
 
-  deleteMachine () {
-    return del(`${this.baseUrl}/api/machines/${this.id}`)
+  constructor (baseUrl, id) {
+    super('machines', baseUrl, id)
   }
 
   /**
@@ -240,6 +251,10 @@ class MachineSdk extends ResourceSdk {
 }
 
 class LaundrySdk extends ResourceSdk {
+
+  constructor (baseUrl, id) {
+    super('laundries', baseUrl, id)
+  }
 
   createLaundry (name) {
     return post(`${this.baseUrl}/api/laundries`, { name })
@@ -267,25 +282,22 @@ class LaundrySdk extends ResourceSdk {
     return post(`${this.baseUrl}/api/laundries/${this.id}/invite-by-email`, { email })
   }
 
-  deleteLaundry () {
-    return del(`${this.baseUrl}/api/laundries/${this.id}`)
-  }
-
   removeUserFromLaundry (userId) {
     return del(`${this.baseUrl}/api/laundries/${this.id}/users/${userId}`)
   }
 }
 
 class InviteSdk extends ResourceSdk {
-  deleteInvite () {
-    return del(`${this.baseUrl}/api/invites/${this.id}`)
+
+  constructor (baseUrl, id) {
+    super('invites', baseUrl, id)
   }
 }
 
 class BookingSdk extends ResourceSdk {
 
-  deleteBooking () {
-    return del(`${this.baseUrl}/api/bookings/${this.id}`)
+  constructor (baseUrl, id) {
+    super('bookings', baseUrl, id)
   }
 }
 

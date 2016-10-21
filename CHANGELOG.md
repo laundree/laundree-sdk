@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+ - Common functions for deletion and getting resources
+
 ## [0.0.4]
 
 ### Added
