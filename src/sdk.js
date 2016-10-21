@@ -65,7 +65,7 @@ class Sdk {
   }
 
   get laundry () {
-    const f = (id) => new LaundrySdk(id)
+    const f = (id) => new LaundrySdk(this.baseUrl, id)
     const laundry = new LaundrySdk(this.baseUrl)
     setupF(f, laundry, 'createDemoLaundry')
     setupF(f, laundry, 'createLaundry')
@@ -270,8 +270,8 @@ class LaundrySdk extends ResourceSdk {
       .then(({ body }) => body)
   }
 
-  updateName (name) {
-    return put(`${this.baseUrl}/api/laundries/${this.id}`, { name })
+  updateLaundry ({name, timezone}) {
+    return put(`${this.baseUrl}/api/laundries/${this.id}`, { name, timezone })
   }
 
   createMachine (name, type) {
@@ -279,6 +279,7 @@ class LaundrySdk extends ResourceSdk {
   }
 
   inviteUserByEmail (email) {
+    console.log(this)
     return post(`${this.baseUrl}/api/laundries/${this.id}/invite-by-email`, { email })
   }
 
