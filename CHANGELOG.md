@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+ - Booking API
+
+
 ## [0.0.7]
 
 ### Fixed

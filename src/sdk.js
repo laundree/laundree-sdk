@@ -102,7 +102,7 @@ class Sdk {
   }
 
   listBookingsInTime (laundryId, from, to) {
-    return this.emit('listBookingsInTime', laundryId, from.getTime(), to.getTime())
+    return this.emit('listBookingsInTime', laundryId, from, to)
   }
 
   listBookingsForUser (laundryId, userId, filter = {}) {
@@ -246,7 +246,7 @@ class MachineSdk extends ResourceSdk {
    * @param {Date} to
    */
   createBooking (from, to) {
-    return post(`${this.baseUrl}/api/machines/${this.id}/bookings`, { from: from.toISOString(), to: to.toISOString() })
+    return post(`${this.baseUrl}/api/machines/${this.id}/bookings`, { from: from, to: to })
   }
 }
 
