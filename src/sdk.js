@@ -270,8 +270,8 @@ class LaundrySdk extends ResourceSdk {
       .then(({ body }) => body)
   }
 
-  updateLaundry ({name, timezone}) {
-    return put(`${this.baseUrl}/api/laundries/${this.id}`, { name, timezone })
+  updateLaundry ({name, timezone, rules}) {
+    return put(`${this.baseUrl}/api/laundries/${this.id}`, { name, timezone, rules})
   }
 
   createMachine (name, type) {

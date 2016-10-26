@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add rules to `PUT /api/laundries/{id}`
+
 ## [0.0.8]
 
 ### Changed
@@ -34,4 +36,3 @@
 ### Fixed
 
  - `index.js` exporting sdk
- 
