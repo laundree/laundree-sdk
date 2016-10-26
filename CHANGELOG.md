@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.0.9]
+
 - Add rules to `PUT /api/laundries/{id}`
 
 ## [0.0.8]
