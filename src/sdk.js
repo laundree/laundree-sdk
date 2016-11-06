@@ -7,7 +7,7 @@ const EventEmitter = require('events')
 const Promise = require('promise')
 
 function req (method, path, data = null) {
-  const req = request[ method ](path)
+  const req = request[method](path)
   if (!data) return req.then()
   return req
     .send(data)
@@ -33,8 +33,8 @@ function get (path) {
 var jobId = 1
 
 function setupF (f, instance, functionName) {
-  f[ functionName ] = function () {
-    return instance[ functionName ].apply(instance, arguments)
+  f[functionName] = function () {
+    return instance[functionName].apply(instance, arguments)
   }
 }
 
@@ -80,8 +80,8 @@ class Sdk {
     return (id) => new BookingSdk(this.baseUrl, id)
   }
 
-  contact ({ name, email, subject, message }) {
-    return post(this.baseUrl + '/api/contact', { name, email, subject, message })
+  contact ({name, email, subject, message}) {
+    return post(this.baseUrl + '/api/contact', {name, email, subject, message})
   }
 
   setupRedux (store, socket) {
@@ -93,8 +93,8 @@ class Sdk {
   emit (action) {
     const jId = jobId++
     const args = Array.prototype.slice.call(arguments, 1)
-    const opts = { jobId: jId }
-    const newArgs = [ action, opts ].concat(args)
+    const opts = {jobId: jId}
+    const newArgs = [action, opts].concat(args)
     return new Promise(resolve => {
       this.jobEventEmitter.once(jId, resolve)
       this.socket.emit.apply(this.socket, newArgs)
@@ -158,30 +158,30 @@ class UserSdk extends ResourceSdk {
 
   fromEmail (email) {
     return get(`${this.baseUrl}/api/users?email=${encodeURIComponent(email)}`)
-      .then(({ body }) => {
+      .then(({body}) => {
         if (!body) return null
         if (body.length !== 1) return null
-        return body[ 0 ]
+        return body[0]
       })
   }
 
   createUser (displayName, email, password) {
-    return post(`${this.baseUrl}/api/users`, { displayName, email, password })
-      .then(({ body }) => {
+    return post(`${this.baseUrl}/api/users`, {displayName, email, password})
+      .then(({body}) => {
         if (!body) return null
         return body
       })
   }
 
   signUpUser (name, email, password) {
-    return UserSdk
+    return this
       .createUser(name, email, password)
-      .then(({ id }) => new UserSdk(this.baseUrl, id)
+      .then(({id}) => new UserSdk(this.baseUrl, id)
         .startEmailVerification(email))
   }
 
   startEmailVerification (email) {
-    return UserSdk
+    return this
       .fromEmail(email)
       .then(user => {
         if (!user) throw new Error('User not found')
@@ -191,7 +191,7 @@ class UserSdk extends ResourceSdk {
   }
 
   forgotPassword (email) {
-    return UserSdk
+    return this
       .fromEmail(email)
       .then(user => {
         if (!user) throw new Error('User not found')
@@ -201,19 +201,19 @@ class UserSdk extends ResourceSdk {
   }
 
   resetPassword (token, password) {
-    return post(`${this.baseUrl}/api/users/${this.id}/password-reset`, { token, password })
+    return post(`${this.baseUrl}/api/users/${this.id}/password-reset`, {token, password})
   }
 
   listEmails () {
-    return get(`${this.baseUrl}/api/users/${this.id}/emails`).then(({ body }) => body)
+    return get(`${this.baseUrl}/api/users/${this.id}/emails`).then(({body}) => body)
   }
 
   updateName (name) {
-    return put(`${this.baseUrl}/api/users/${this.id}`, { name })
+    return put(`${this.baseUrl}/api/users/${this.id}`, {name})
   }
 
   changePassword (currentPassword, newPassword) {
-    return post(`${this.baseUrl}/api/users/${this.id}/password-change`, { currentPassword, newPassword })
+    return post(`${this.baseUrl}/api/users/${this.id}/password-change`, {currentPassword, newPassword})
   }
 
   startPasswordReset () {
@@ -221,7 +221,7 @@ class UserSdk extends ResourceSdk {
   }
 
   _startEmailVerification (email) {
-    return post(`${this.baseUrl}/api/users/${this.id}/start-email-verification`, { email })
+    return post(`${this.baseUrl}/api/users/${this.id}/start-email-verification`, {email})
   }
 
 }
@@ -246,7 +246,7 @@ class MachineSdk extends ResourceSdk {
    * @param {Date} to
    */
   createBooking (from, to) {
-    return post(`${this.baseUrl}/api/machines/${this.id}/bookings`, { from: from, to: to })
+    return post(`${this.baseUrl}/api/machines/${this.id}/bookings`, {from: from, to: to})
   }
 }
 
@@ -257,7 +257,7 @@ class LaundrySdk extends ResourceSdk {
   }
 
   createLaundry (name) {
-    return post(`${this.baseUrl}/api/laundries`, { name })
+    return post(`${this.baseUrl}/api/laundries`, {name})
       .then((response) => response.body || null)
   }
 
@@ -267,20 +267,20 @@ class LaundrySdk extends ResourceSdk {
    */
   createDemoLaundry () {
     return post(`${this.baseUrl}/api/laundries/demo`)
-      .then(({ body }) => body)
+      .then(({body}) => body)
   }
 
   updateLaundry ({name, timezone, rules}) {
-    return put(`${this.baseUrl}/api/laundries/${this.id}`, { name, timezone, rules})
+    return put(`${this.baseUrl}/api/laundries/${this.id}`, {name, timezone, rules})
   }
 
   createMachine (name, type) {
-    return post(`${this.baseUrl}/api/laundries/${this.id}/machines`, { name, type })
+    return post(`${this.baseUrl}/api/laundries/${this.id}/machines`, {name, type})
   }
 
   inviteUserByEmail (email) {
     console.log(this)
-    return post(`${this.baseUrl}/api/laundries/${this.id}/invite-by-email`, { email })
+    return post(`${this.baseUrl}/api/laundries/${this.id}/invite-by-email`, {email})
   }
 
   removeUserFromLaundry (userId) {
