@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.0.10]
+
 - Fix errors when `findFromEmail`
 
 ## [0.0.9]
