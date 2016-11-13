@@ -113,16 +113,16 @@ class Sdk {
     return this.emit('listUsersAndInvites', laundryId)
   }
 
-  listUsers () {
-    return this.emit('listUsers')
+  listUsers (options) {
+    return this.emit('listUsers', options)
   }
 
   listMachines (laundryId) {
     return this.emit('listMachines', laundryId)
   }
 
-  listLaundries () {
-    return this.emit('listLaundries')
+  listLaundries (options) {
+    return this.emit('listLaundries', options)
   }
 
   listMachinesAndUsers (laundryId) {

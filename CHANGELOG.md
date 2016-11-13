@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add options to `listUsers` and `listLaundries`
+
 ## [0.0.10]
 
 - Fix errors when `findFromEmail`
