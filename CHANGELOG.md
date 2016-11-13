@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.0.11]
+
 - Add options to `listUsers` and `listLaundries`
 
 ## [0.0.10]
