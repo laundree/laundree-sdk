@@ -286,6 +286,10 @@ class LaundrySdk extends ResourceSdk {
   removeUserFromLaundry (userId) {
     return del(`${this.baseUrl}/api/laundries/${this.id}/users/${userId}`)
   }
+
+  createInviteCode () {
+    return post(`${this.baseUrl}/api/laundries/${this.id}/invite-code`).then(({body}) => body)
+  }
 }
 
 class InviteSdk extends ResourceSdk {

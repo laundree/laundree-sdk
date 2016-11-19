@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add `createInviteCode`.
+
 ## [0.0.11]
 
 - Add options to `listUsers` and `listLaundries`
