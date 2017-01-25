@@ -1,5 +1,7 @@
 # laundree-sdk
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/laundree/laundree-sdk.svg)](https://greenkeeper.io/)
+
 
 [![Code Style](https://img.shields.io/badge/code%20style-standard-blue.svg?style=flat)](https://github.com/feross/standard)
 
