@@ -4,7 +4,7 @@
   "description": "An sdk for laundree.io",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "eslint .",
     "postpublish": "greenkeeper-postpublish"
   },
   "repository": {
@@ -22,8 +22,6 @@
   },
   "homepage": "https://github.com/laundree/laundree-sdk#readme",
   "dependencies": {
-    "promis": "^1.1.4",
-    "promise": "^7.1.1",
     "superagent": "^2.3.0"
   },
   "devDependencies": {

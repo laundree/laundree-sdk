@@ -1,6 +1,18 @@
 language: node
-
 cache:
   directories:
-    - node_modules
+  - node_modules
 
+script:
+- npm install
+- echo "$NPM_SECRET" >> ~/.npmrc
+- npm test
+
+deploy:
+  provider: script
+  script: npm publish
+  on:
+    branch: master
+env:
+  global:
+    secure: ZPO3p89EK6ZfUOSJ/Kgc679514R+sUnAkGCaci6bmXALLuVs1YsES8CLMAhdnoJx6psecFFrlgzWFdxoYe9DkuwaRzYanfJF/Xq3TuUVs2tgsheoVzMBT7yg1+3dnTj0M7mOjLz+e6KlvQKdsMWwT88SEQP/sRIB8DW1Z5kSbrh9Owg0s7CP5KFYhvC48GtSO3tyJzVPC+X5IiFdVlAu5YHjK/hbcALnWb5rUmkVVeLKE0IT5RiLPglKKcLn1JkpO2j7tGuh75zhVPkuCMwXmj/kMeRjS1pgUm0UzJVHuh+TZlNJNQnYyZbFfnz5anGxCFlZLdD1eC76uY6Wrh11naqvWXE+P1wn1L1N6XpRWCWvbCoUAEaGiqkGqUbgpiDfe27fQqes2KRUo+Ji1kKSbbdpTunw8BwvoFvSoalHUX6qJlc/N7ApwT9scAd043HHu/qshH45qVD5kLiq5gmHWIwaTo+InapBzm3lbQWn5JlEqYD3QMMMbC3QgL03DpR0vt7zZ3OWrFCKYI5GR+N1v7/1uW79xsFRaepeVz/LDSeyDrLmi7hRIYswVC+jn1qWFJOsrO+roQ4b5j1a6XJ1hd4dEqZKPi8AvCvsXw4RClpQME0SoIIcXpJcQUTgmMUvznWVxy5PSSFkAWwGfU+E2mSXmW9xxKUSvnS34n0vilk=
