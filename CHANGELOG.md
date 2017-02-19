@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+- Update API
+- Add redux
+- Enable travis
+
 ## [0.0.12]
 
 - Add `createInviteCode`.

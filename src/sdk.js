@@ -4,7 +4,6 @@
 
 const request = require('superagent')
 const EventEmitter = require('events')
-const Promise = require('promise')
 
 function req (method, path, data = null) {
   const req = request[method](path)
@@ -30,7 +29,7 @@ function get (path) {
   return req('get', path)
 }
 
-var jobId = 1
+let jobId = 1
 
 function setupF (f, instance, functionName) {
   f[functionName] = function () {
@@ -127,6 +126,14 @@ class Sdk {
 
   listMachinesAndUsers (laundryId) {
     return this.emit('listMachinesAndUsers', laundryId)
+  }
+
+  fetchLaundry (laundryId) {
+    return this.emit('fetchLaundry', laundryId)
+  }
+
+  fetchUser (userId) {
+    return this.emit('fetchUser', userId)
   }
 
   updateStats () {
@@ -256,9 +263,9 @@ class LaundrySdk extends ResourceSdk {
     super('laundries', baseUrl, id)
   }
 
-  createLaundry (name) {
-    return post(`${this.baseUrl}/api/laundries`, {name})
-      .then((response) => response.body || null)
+  createLaundry (name, googlePlaceId) {
+    return post(`${this.baseUrl}/api/laundries`, {name, googlePlaceId})
+      .then(response => response.body || null)
   }
 
   /**
@@ -270,16 +277,15 @@ class LaundrySdk extends ResourceSdk {
       .then(({body}) => body)
   }
 
-  updateLaundry ({name, timezone, rules}) {
-    return put(`${this.baseUrl}/api/laundries/${this.id}`, {name, timezone, rules})
+  updateLaundry ({name, googlePlaceId, rules}) {
+    return put(`${this.baseUrl}/api/laundries/${this.id}`, {name, googlePlaceId, rules})
   }
 
-  createMachine (name, type) {
-    return post(`${this.baseUrl}/api/laundries/${this.id}/machines`, {name, type})
+  createMachine (name, type, broken) {
+    return post(`${this.baseUrl}/api/laundries/${this.id}/machines`, {name, type, broken})
   }
 
   inviteUserByEmail (email) {
-    console.log(this)
     return post(`${this.baseUrl}/api/laundries/${this.id}/invite-by-email`, {email})
   }
 
@@ -289,6 +295,14 @@ class LaundrySdk extends ResourceSdk {
 
   createInviteCode () {
     return post(`${this.baseUrl}/api/laundries/${this.id}/invite-code`).then(({body}) => body)
+  }
+
+  addOwner (userId) {
+    return post(`${this.baseUrl}/api/laundries/${this.id}/owners/${userId}`)
+  }
+
+  removeOwner (userId) {
+    return del(`${this.baseUrl}/api/laundries/${this.id}/owners/${userId}`)
   }
 }
 

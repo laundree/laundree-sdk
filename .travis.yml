@@ -1,6 +1,19 @@
-language: node
-
+language: node_js
+node_js:
+- '6'
+- '7'
 cache:
   directories:
-    - node_modules
-
+  - node_modules
+script:
+- npm install
+- echo "$NPM_SECRET" >> ~/.npmrc
+- npm test
+deploy:
+  provider: npm
+  email: budde377@gmail.com
+  api_key:
+    secure: VjXHsSUDqu12RBlTc9+L3lDYU9ctKFicM+6caS9yfkAiishmtdelrcuaPjGwRXSqkh0FJIGmWEbFi/g9WJMZMzlkfo4HSRn/EDy6HAIJKeIByiMAGdPzXW8Yb92fimuEL9ZqvlYX6rqzOtu+nkihBEdLHxGbICV9yQ2pv53o2piQrFNeR7dILEAOCKzv7no5zorpYvp+uMFdJkamCz8KLAUOLZYy7NswWPYEyuZhaamYO2RLILZORYzskuGeW8uyvJy/KM4Xjho+m0LHlRhZB5loVwsYsa8Ais0hovXFY9zgmyS9/agmVLl3vxE933mKtePcj+SUUdaCfzg1f9Q4xBmhwY2MV2jqIq9WfKR4rmxMhB9WX35ca/cvpNrBIioONz7mDCx7zkZPiRiHNIHAffzZVf7RQfLv2m8NYLcHOiyFafNIYFln7LrKcd3r797A+ZdSn9SKJghW2Br/kfpar8aoPlkkUCsMgNwE1UlLtVHZ8REKCBdn+ZOlQp3ddtbErLcIz7ovnDcEcUvoJS2JSRz8I3L1Y3VivMpXcRiuDznCQ2sbpSxr/jxebSQt2Hr38VkkG/vThUmcYrfCZgna1QKj82MAMbh6ARPXkSg0rcf4qL+OjFABFk1gcNSXoOsgq5pOFcJa1Rg3WSuWfjWdcJkt1hFjwSWPUerpipQ/Cjo=
+  on:
+    tags: true
+    repo: laundree/sdk

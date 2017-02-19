@@ -1,9 +1,12 @@
 {
   "extends": [
-    "standard",
+    "standard"
   ],
   "parser": "babel-eslint",
   "env": {
     "node": true
+  },
+  "rules": {
+    "no-var": "error"
   }
 }
