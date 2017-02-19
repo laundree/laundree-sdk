@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## [0.0.14]
+- Nop
+
 ## [0.0.13]
 - Update API
 - Add redux
