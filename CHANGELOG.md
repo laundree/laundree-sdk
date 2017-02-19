@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## [0.0.16]
+- Bugfixes to travis
+
 ## [0.0.15]
 - Bugfixes to travis
 
