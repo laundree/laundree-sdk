@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+## [0.0.17]
+- Fix add assign immutable
 
 ## [0.0.16]
 - Bugfixes to travis
