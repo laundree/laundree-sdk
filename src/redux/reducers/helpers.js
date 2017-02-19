@@ -2,7 +2,12 @@
  * Created by budde on 25/06/16.
  */
 const {handleActions} = require('redux-actions')
-const object = require('../../utils/object')
+
+function assignImmutable (obj, key, value) {
+  const o = {}
+  o[key] = value
+  return Object.assign({}, obj, o)
+}
 
 function arrayToObject (array) {
   return array.reduce((obj, element) => {
@@ -24,7 +29,7 @@ function setupCollection (addActions, deleteActions = [], listActions = [], mapp
     const mapper = mappers[action] || (p => p)
     actionMap[action] = (state, {payload}) => {
       payload = mapper(payload)
-      return object.assignImmutable(state, payload.id, payload)
+      return assignImmutable(state, payload.id, payload)
     }
   })
   deleteActions.forEach(deleteAction => {
