@@ -79,6 +79,13 @@ class Sdk {
     return (id) => new BookingSdk(this.baseUrl, id)
   }
 
+  get token () {
+    const f = id => new TokenSdk(this.baseUrl, id)
+    const token = new TokenSdk(this.baseUrl)
+    setupF(f, token, 'createTokenFromEmailPassword')
+    return f
+  }
+
   contact ({name, email, subject, message}) {
     return post(this.baseUrl + '/api/contact', {name, email, subject, message})
   }
@@ -138,6 +145,10 @@ class Sdk {
 
   updateStats () {
     return this.emit('updateStats')
+  }
+
+  setupInitialEvents () {
+    return this.emit('setupInitialEvents')
   }
 }
 
@@ -253,7 +264,23 @@ class MachineSdk extends ResourceSdk {
    * @param {Date} to
    */
   createBooking (from, to) {
-    return post(`${this.baseUrl}/api/machines/${this.id}/bookings`, {from: from, to: to})
+    return post(`${this.baseUrl}/api/machines/${this.id}/bookings`, {from, to})
+  }
+}
+
+class TokenSdk extends ResourceSdk {
+
+  constructor (baseUrl, id) {
+    super('tokens', baseUrl, id)
+  }
+
+  /**
+   * @param {string} name
+   * @param {string} email
+   * @param {string} password
+   */
+  createTokenFromEmailPassword (name, email, password) {
+    return post(`${this.baseUrl}/api/tokens/email-password`, {name, email, password}).then(({body}) => body)
   }
 }
 

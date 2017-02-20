@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- Add email-password token generation endpoint
+- Add setupInitialValues socket function
+
 ## [0.0.17]
 - Fix add assign immutable
 
