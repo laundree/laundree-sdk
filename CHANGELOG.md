@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## [0.0.20]
+
+- Fix lint
+
 ## [0.0.19]
 
 - Add auth
