@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.0.19]
+
 - Add auth
 
 ## [0.0.18]
