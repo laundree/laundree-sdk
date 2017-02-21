@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+
+- Add auth
+
 ## [0.0.18]
 - Add email-password token generation endpoint
 - Add setupInitialValues socket function
