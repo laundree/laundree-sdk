@@ -63,7 +63,7 @@ class Sdk {
   }
 
   contact ({name, email, subject, message}) {
-    return post(this.baseUrl + '/api/contact', {name, email, subject, message})
+    return this._post(this.baseUrl + '/api/contact', {name, email, subject, message})
   }
 
   setupRedux (store, socket) {
