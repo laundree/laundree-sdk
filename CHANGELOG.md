@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.0.22]
+
 - Use custom basic auth
 
 ## [0.0.21]
