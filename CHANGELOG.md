@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add create-token function
+- Add "add-from-code" function
+
 ## [0.0.20]
 
 - Fix lint

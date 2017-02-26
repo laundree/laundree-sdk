@@ -59,6 +59,7 @@ class Sdk {
     const f = id => new TokenSdk(this, id)
     const token = new TokenSdk(this)
     setupF(f, token, 'createTokenFromEmailPassword')
+    setupF(f, token, 'createToken')
     return f
   }
 
@@ -302,6 +303,14 @@ class TokenSdk extends ResourceSdk {
   }
 
   /**
+   * Creates a token
+   * @param {String} name
+   */
+  createToken (name) {
+    return this._post(`${this.baseUrl}/api/tokens`, {name}).then(({body}) => body)
+  }
+
+  /**
    * @param {string} name
    * @param {string} email
    * @param {string} password
@@ -357,6 +366,10 @@ class LaundrySdk extends ResourceSdk {
 
   removeOwner (userId) {
     return this._del(`${this.baseUrl}/api/laundries/${this.id}/owners/${userId}`)
+  }
+
+  addFromCode (code) {
+    return this._post(`${this.baseUrl}/api/laundries/${this.id}/users/add-from-code`, {key: code})
   }
 }
 
