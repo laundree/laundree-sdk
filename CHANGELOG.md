@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Use custom basic auth
+
 ## [0.0.21]
 
 - Add create-token function

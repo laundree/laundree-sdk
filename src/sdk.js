@@ -4,6 +4,7 @@
 
 const request = require('superagent')
 const EventEmitter = require('events')
+const {Buffer} = require('buffer')
 
 let jobId = 1
 
@@ -133,9 +134,9 @@ class Sdk {
   }
 
   _req (method, path, data = null) {
-    const req = request[method](path)
+    let req = request[method](path)
     if (this.auth) {
-      req.auth(this.auth.userId, this.auth.token)
+      req = req.set('Authorization', `Basic ${Buffer.from(`${this.auth.userId}:${this.auth.token}`).toString('base64')}`)
     }
     if (!data) return req.then()
     return req
