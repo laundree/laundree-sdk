@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.0.21]
+
 - Add create-token function
 - Add "add-from-code" function
 
