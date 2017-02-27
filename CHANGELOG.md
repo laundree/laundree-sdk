@@ -1,5 +1,45 @@
 # Changelog
 
+## Unreleased
+
+## [0.0.22]
+
+- Use custom basic auth
+
+## [0.0.21]
+
+- Add create-token function
+- Add "add-from-code" function
+
+## [0.0.20]
+
+- Fix lint
+
+## [0.0.19]
+
+- Add auth
+
+## [0.0.18]
+- Add email-password token generation endpoint
+- Add setupInitialValues socket function
+
+## [0.0.17]
+- Fix add assign immutable
+
+## [0.0.16]
+- Bugfixes to travis
+
+## [0.0.15]
+- Bugfixes to travis
+
+## [0.0.14]
+- Nop
+
+## [0.0.13]
+- Update API
+- Add redux
+- Enable travis
+
 ## [0.0.12]
 
 - Add `createInviteCode`.

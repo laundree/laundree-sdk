@@ -1,6 +1,19 @@
-language: node
-
+language: node_js
+node_js:
+- '7'
 cache:
   directories:
-    - node_modules
-
+  - node_modules
+script:
+- npm install
+- echo "$NPM_SECRET" >> ~/.npmrc
+- npm test
+deploy:
+  provider: script
+  script: npm publish
+  on:
+    tags: true
+    repo: laundree/sdk
+env:
+  global:
+    secure: RxazIPoDrgToNpLB8oYOxatogmu6fzk6rBVsrOlHI1agJTmMj/fzqZRtaKku+xOFxqOpWkO+ZBzbcRmgO60MMcXHSyAySIqIKiEICckhs2YnhEJLqFV6IzsRSOclVzdWB98NYgFUmd5z0cOtR83n0jGObnntFTrBrJJX475Ju/EvFPx/OIxINpKqXHNt8BL4jjt58htxxTYEh8E95HIJM2WBO/iXyqpaQxAMqX2z9Q0U4TFN48/VPsFA2+YCOOW3rTAVwRx+BJHLVj0JYHVjYUezkvwPkeQXTzbesgTbLtMIhMqk2acUGS7WjoVQKbDazn0vo6x+R7Fk+GGzREA8O3xu77LOz8pMuCPRMKuA2ZekBiv95+/Pi6zNHj6ou42NVSooqkEP30aHfA1SHerIHy5C1Uv4uzLxVn9uzn5tEHUkpmhKeBUTCTnrJXXXPQId2VdT0244XUkKcVGqagXXM9Y9c47DtjZghz46JDGqeyVo84TLLODvkAuhkZt5SuGFdOW3XRIDsJ3o1aQLSRS9ciw1dOg9Ol3jemMNn3rw1BqouB36NKv2hDnS4MRU6KHAngKEYiTyn3odaGy8yRP0MCAZDyC3TkBrONRbA0107u+KGY47OabbHrYAUL54Af1seO12zHBlv7JvIAeqfrSjlVBKBCDmj3eEcO0DhlVmS8c=

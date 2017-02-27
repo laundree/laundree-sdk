@@ -4,33 +4,9 @@
 
 const request = require('superagent')
 const EventEmitter = require('events')
-const Promise = require('promise')
+const {Buffer} = require('buffer')
 
-function req (method, path, data = null) {
-  const req = request[method](path)
-  if (!data) return req.then()
-  return req
-    .send(data)
-    .then()
-}
-
-function post (path, data = null) {
-  return req('post', path, data)
-}
-
-function del (path) {
-  return req('delete', path)
-}
-
-function put (path, data = null) {
-  return req('put', path, data)
-}
-
-function get (path) {
-  return req('get', path)
-}
-
-var jobId = 1
+let jobId = 1
 
 function setupF (f, instance, functionName) {
   f[functionName] = function () {
@@ -50,8 +26,8 @@ class Sdk {
   }
 
   get user () {
-    const f = (id) => new UserSdk(this.baseUrl, id)
-    const user = new UserSdk(this.baseUrl)
+    const f = (id) => new UserSdk(this, id)
+    const user = new UserSdk(this)
     setupF(f, user, 'fromEmail')
     setupF(f, user, 'createUser')
     setupF(f, user, 'signUpUser')
@@ -61,27 +37,35 @@ class Sdk {
   }
 
   get machine () {
-    return (id) => new MachineSdk(this.baseUrl, id)
+    return (id) => new MachineSdk(this, id)
   }
 
   get laundry () {
-    const f = (id) => new LaundrySdk(this.baseUrl, id)
-    const laundry = new LaundrySdk(this.baseUrl)
+    const f = (id) => new LaundrySdk(this, id)
+    const laundry = new LaundrySdk(this)
     setupF(f, laundry, 'createDemoLaundry')
     setupF(f, laundry, 'createLaundry')
     return f
   }
 
   get invite () {
-    return (id) => new InviteSdk(this.baseUrl, id)
+    return (id) => new InviteSdk(this, id)
   }
 
   get booking () {
-    return (id) => new BookingSdk(this.baseUrl, id)
+    return (id) => new BookingSdk(this, id)
+  }
+
+  get token () {
+    const f = id => new TokenSdk(this, id)
+    const token = new TokenSdk(this)
+    setupF(f, token, 'createTokenFromEmailPassword')
+    setupF(f, token, 'createToken')
+    return f
   }
 
   contact ({name, email, subject, message}) {
-    return post(this.baseUrl + '/api/contact', {name, email, subject, message})
+    return this._post(this.baseUrl + '/api/contact', {name, email, subject, message})
   }
 
   setupRedux (store, socket) {
@@ -99,6 +83,10 @@ class Sdk {
       this.jobEventEmitter.once(jId, resolve)
       this.socket.emit.apply(this.socket, newArgs)
     })
+  }
+
+  updateAuth ({userId, token}) {
+    this.auth = !(userId && token) ? null : {userId, token}
   }
 
   listBookingsInTime (laundryId, from, to) {
@@ -129,35 +117,94 @@ class Sdk {
     return this.emit('listMachinesAndUsers', laundryId)
   }
 
+  fetchLaundry (laundryId) {
+    return this.emit('fetchLaundry', laundryId)
+  }
+
+  fetchUser (userId) {
+    return this.emit('fetchUser', userId)
+  }
+
   updateStats () {
     return this.emit('updateStats')
+  }
+
+  setupInitialEvents () {
+    return this.emit('setupInitialEvents')
+  }
+
+  _req (method, path, data = null) {
+    let req = request[method](path)
+    if (this.auth) {
+      req = req.set('Authorization', `Basic ${Buffer.from(`${this.auth.userId}:${this.auth.token}`).toString('base64')}`)
+    }
+    if (!data) return req.then()
+    return req
+      .send(data)
+      .then()
+  }
+
+  _post (path, data = null) {
+    return this._req('post', path, data)
+  }
+
+  _del (path) {
+    return this._req('delete', path)
+  }
+
+  _put (path, data = null) {
+    return this._req('put', path, data)
+  }
+
+  _get (path) {
+    return this._req('get', path)
   }
 }
 
 class ResourceSdk {
-  constructor (resourcePath, baseUrl = '', id = '') {
+  constructor (resourcePath, sdk, id = '') {
     this.resourcePath = resourcePath
+    this.sdk = sdk
     this.id = id
-    this.baseUrl = baseUrl
+  }
+
+  get baseUrl () {
+    return this.sdk.baseUrl
+  }
+
+  _get (path) {
+    return this.sdk._get(path)
+  }
+
+  _del (path) {
+    return this.sdk._del(path)
+  }
+
+  _put (path, data) {
+    return this.sdk._put(path, data)
+  }
+
+  _post (path, data) {
+    return this.sdk._post(path, data)
   }
 
   get () {
-    return get(`${this.baseUrl}/api/${this.resourcePath}/${this.id}`).then(({body}) => body)
+    return this.sdk._get(`${this.baseUrl}/api/${this.resourcePath}/${this.id}`).then(({body}) => body)
   }
 
   del () {
-    return del(`${this.baseUrl}/api/${this.resourcePath}/${this.id}`)
+    return this.sdk._del(`${this.baseUrl}/api/${this.resourcePath}/${this.id}`)
   }
 }
 
 class UserSdk extends ResourceSdk {
 
-  constructor (baseUrl, id) {
-    super('users', baseUrl, id)
+  constructor (sdk, id) {
+    super('users', sdk, id)
   }
 
   fromEmail (email) {
-    return get(`${this.baseUrl}/api/users?email=${encodeURIComponent(email)}`)
+    return this._get(`${this.baseUrl}/api/users?email=${encodeURIComponent(email)}`)
       .then(({body}) => {
         if (!body) return null
         if (body.length !== 1) return null
@@ -166,7 +213,7 @@ class UserSdk extends ResourceSdk {
   }
 
   createUser (displayName, email, password) {
-    return post(`${this.baseUrl}/api/users`, {displayName, email, password})
+    return this._post(`${this.baseUrl}/api/users`, {displayName, email, password})
       .then(({body}) => {
         if (!body) return null
         return body
@@ -176,7 +223,7 @@ class UserSdk extends ResourceSdk {
   signUpUser (name, email, password) {
     return this
       .createUser(name, email, password)
-      .then(({id}) => new UserSdk(this.baseUrl, id)
+      .then(({id}) => new UserSdk(this, id)
         .startEmailVerification(email))
   }
 
@@ -185,7 +232,7 @@ class UserSdk extends ResourceSdk {
       .fromEmail(email)
       .then(user => {
         if (!user) throw new Error('User not found')
-        return new UserSdk(this.baseUrl, user.id)
+        return new UserSdk(this, user.id)
           ._startEmailVerification(email)
       })
   }
@@ -195,41 +242,41 @@ class UserSdk extends ResourceSdk {
       .fromEmail(email)
       .then(user => {
         if (!user) throw new Error('User not found')
-        return new UserSdk(this.baseUrl, user.id)
+        return new UserSdk(this, user.id)
           .startPasswordReset()
       })
   }
 
   resetPassword (token, password) {
-    return post(`${this.baseUrl}/api/users/${this.id}/password-reset`, {token, password})
+    return this._post(`${this.baseUrl}/api/users/${this.id}/password-reset`, {token, password})
   }
 
   listEmails () {
-    return get(`${this.baseUrl}/api/users/${this.id}/emails`).then(({body}) => body)
+    return this._get(`${this.baseUrl}/api/users/${this.id}/emails`).then(({body}) => body)
   }
 
   updateName (name) {
-    return put(`${this.baseUrl}/api/users/${this.id}`, {name})
+    return this._put(`${this.baseUrl}/api/users/${this.id}`, {name})
   }
 
   changePassword (currentPassword, newPassword) {
-    return post(`${this.baseUrl}/api/users/${this.id}/password-change`, {currentPassword, newPassword})
+    return this._post(`${this.baseUrl}/api/users/${this.id}/password-change`, {currentPassword, newPassword})
   }
 
   startPasswordReset () {
-    return post(`${this.baseUrl}/api/users/${this.id}/start-password-reset`)
+    return this._post(`${this.baseUrl}/api/users/${this.id}/start-password-reset`)
   }
 
   _startEmailVerification (email) {
-    return post(`${this.baseUrl}/api/users/${this.id}/start-email-verification`, {email})
+    return this._post(`${this.baseUrl}/api/users/${this.id}/start-email-verification`, {email})
   }
 
 }
 
 class MachineSdk extends ResourceSdk {
 
-  constructor (baseUrl, id) {
-    super('machines', baseUrl, id)
+  constructor (sdk, id) {
+    super('machines', sdk, id)
   }
 
   /**
@@ -237,7 +284,7 @@ class MachineSdk extends ResourceSdk {
    * @param {{name:string=, type: string=}} params
    */
   updateMachine (params) {
-    return put(`${this.baseUrl}/api/machines/${this.id}`, params)
+    return this._put(`${this.baseUrl}/api/machines/${this.id}`, params)
   }
 
   /**
@@ -246,19 +293,43 @@ class MachineSdk extends ResourceSdk {
    * @param {Date} to
    */
   createBooking (from, to) {
-    return post(`${this.baseUrl}/api/machines/${this.id}/bookings`, {from: from, to: to})
+    return this._post(`${this.baseUrl}/api/machines/${this.id}/bookings`, {from, to})
+  }
+}
+
+class TokenSdk extends ResourceSdk {
+
+  constructor (sdk, id) {
+    super('tokens', sdk, id)
+  }
+
+  /**
+   * Creates a token
+   * @param {String} name
+   */
+  createToken (name) {
+    return this._post(`${this.baseUrl}/api/tokens`, {name}).then(({body}) => body)
+  }
+
+  /**
+   * @param {string} name
+   * @param {string} email
+   * @param {string} password
+   */
+  createTokenFromEmailPassword (name, email, password) {
+    return this._post(`${this.baseUrl}/api/tokens/email-password`, {name, email, password}).then(({body}) => body)
   }
 }
 
 class LaundrySdk extends ResourceSdk {
 
-  constructor (baseUrl, id) {
-    super('laundries', baseUrl, id)
+  constructor (sdk, id) {
+    super('laundries', sdk, id)
   }
 
-  createLaundry (name) {
-    return post(`${this.baseUrl}/api/laundries`, {name})
-      .then((response) => response.body || null)
+  createLaundry (name, googlePlaceId) {
+    return this._post(`${this.baseUrl}/api/laundries`, {name, googlePlaceId})
+      .then(response => response.body || null)
   }
 
   /**
@@ -266,36 +337,47 @@ class LaundrySdk extends ResourceSdk {
    * @returns {Promise.<{email: string, password: string}>}
    */
   createDemoLaundry () {
-    return post(`${this.baseUrl}/api/laundries/demo`)
+    return this._post(`${this.baseUrl}/api/laundries/demo`)
       .then(({body}) => body)
   }
 
-  updateLaundry ({name, timezone, rules}) {
-    return put(`${this.baseUrl}/api/laundries/${this.id}`, {name, timezone, rules})
+  updateLaundry ({name, googlePlaceId, rules}) {
+    return this._put(`${this.baseUrl}/api/laundries/${this.id}`, {name, googlePlaceId, rules})
   }
 
-  createMachine (name, type) {
-    return post(`${this.baseUrl}/api/laundries/${this.id}/machines`, {name, type})
+  createMachine (name, type, broken) {
+    return this._post(`${this.baseUrl}/api/laundries/${this.id}/machines`, {name, type, broken})
   }
 
   inviteUserByEmail (email) {
-    console.log(this)
-    return post(`${this.baseUrl}/api/laundries/${this.id}/invite-by-email`, {email})
+    return this._post(`${this.baseUrl}/api/laundries/${this.id}/invite-by-email`, {email})
   }
 
   removeUserFromLaundry (userId) {
-    return del(`${this.baseUrl}/api/laundries/${this.id}/users/${userId}`)
+    return this._del(`${this.baseUrl}/api/laundries/${this.id}/users/${userId}`)
   }
 
   createInviteCode () {
-    return post(`${this.baseUrl}/api/laundries/${this.id}/invite-code`).then(({body}) => body)
+    return this._post(`${this.baseUrl}/api/laundries/${this.id}/invite-code`).then(({body}) => body)
+  }
+
+  addOwner (userId) {
+    return this._post(`${this.baseUrl}/api/laundries/${this.id}/owners/${userId}`)
+  }
+
+  removeOwner (userId) {
+    return this._del(`${this.baseUrl}/api/laundries/${this.id}/owners/${userId}`)
+  }
+
+  addFromCode (code) {
+    return this._post(`${this.baseUrl}/api/laundries/${this.id}/users/add-from-code`, {key: code})
   }
 }
 
 class InviteSdk extends ResourceSdk {
 
-  constructor (baseUrl, id) {
-    super('invites', baseUrl, id)
+  constructor (sdk, id) {
+    super('invites', sdk, id)
   }
 }
 
