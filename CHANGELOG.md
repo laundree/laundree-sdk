@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.0.23]
+
 - Add `addOneSignalPlayerId`
 
 ## [0.0.22]
