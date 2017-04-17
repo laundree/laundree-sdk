@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add `addOneSignalPlayerId`
+
 ## [0.0.22]
 
 - Use custom basic auth

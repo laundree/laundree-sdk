@@ -254,6 +254,9 @@ class UserSdk extends ResourceSdk {
   listEmails () {
     return this._get(`${this.baseUrl}/api/users/${this.id}/emails`).then(({body}) => body)
   }
+  addOneSignalPlayerId (playerId) {
+    return this._post(`${this.baseUrl}/api/users/${this.id}/one-signal-player-ids`, {playerId})
+  }
 
   updateName (name) {
     return this._put(`${this.baseUrl}/api/users/${this.id}`, {name})
