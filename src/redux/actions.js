@@ -1,7 +1,4 @@
-/**
- * Created by budde on 05/06/16.
- */
-const {createAction} = require('redux-actions')
+// @flow
 
 const SIGN_IN_USER = 'SIGN_IN_USER'
 const LIST_LAUNDRIES = 'LIST_LAUNDRIES'
@@ -30,57 +27,170 @@ const UPDATE_LAUNDRY_LIST_SIZE = 'UPDATE_LAUNDRY_LIST_SIZE'
 const UPDATE_USER_LIST_SIZE = 'UPDATE_USER_LIST_SIZE'
 const CONFIGURE = 'CONFIGURE'
 
-function mapper (handler) {
-  return handler.model ? handler.reduxModel : handler
+export const types = {
+  LIST_MACHINES,
+  CREATE_MACHINE,
+  LIST_LAUNDRIES,
+  SIGN_IN_USER,
+  FLASH,
+  UPDATE_USER,
+  CREATE_LAUNDRY,
+  UPDATE_MACHINE,
+  DELETE_MACHINE,
+  DELETE_LAUNDRY,
+  UPDATE_LAUNDRY,
+  UPDATE_BOOKING,
+  CREATE_BOOKING,
+  DELETE_BOOKING,
+  LIST_BOOKINGS,
+  LIST_BOOKINGS_FOR_USER,
+  LIST_USERS,
+  CREATE_INVITATION,
+  LIST_INVITATIONS,
+  DELETE_INVITATION,
+  UPDATE_INVITATION,
+  UPDATE_STATS,
+  UPDATE_LAUNDRY_LIST_SIZE,
+  UPDATE_USER_LIST_SIZE,
+  FINISH_JOB,
+  CONFIGURE
 }
 
-function arrayMapper (array) {
-  return array.map(mapper)
+export type Model = {
+  id: string
 }
 
-module.exports = {
-  types: {
-    LIST_MACHINES,
-    CREATE_MACHINE,
-    LIST_LAUNDRIES,
-    SIGN_IN_USER,
-    FLASH,
-    UPDATE_USER,
-    CREATE_LAUNDRY,
-    UPDATE_MACHINE,
-    DELETE_MACHINE,
-    DELETE_LAUNDRY,
-    UPDATE_LAUNDRY,
-    UPDATE_BOOKING,
-    CREATE_BOOKING,
-    DELETE_BOOKING,
-    LIST_BOOKINGS,
-    LIST_BOOKINGS_FOR_USER,
-    LIST_USERS,
-    CREATE_INVITATION,
-    LIST_INVITATIONS,
-    DELETE_INVITATION,
-    UPDATE_INVITATION,
-    UPDATE_STATS,
-    UPDATE_LAUNDRY_LIST_SIZE,
-    UPDATE_USER_LIST_SIZE,
-    FINISH_JOB,
-    CONFIGURE
-  },
-  listLaundries: createAction(LIST_LAUNDRIES, arrayMapper),
-  signInUser: createAction(SIGN_IN_USER, mapper),
-  configure: createAction(CONFIGURE),
-  listUsers: createAction(LIST_USERS, arrayMapper),
-  listMachines: createAction(LIST_MACHINES, arrayMapper),
-  listBookingsForUser: createAction(LIST_BOOKINGS_FOR_USER, ({user, bookings}) => ({
-    user: user.model ? user.model.id : user,
-    bookings: arrayMapper(bookings)
-  })),
-  listBookings: createAction(LIST_BOOKINGS, arrayMapper),
-  listInvites: createAction(LIST_INVITATIONS, arrayMapper),
-  updateStats: createAction(UPDATE_STATS),
-  updateLaundryListSize: createAction(UPDATE_LAUNDRY_LIST_SIZE),
-  updateUserListSize: createAction(UPDATE_USER_LIST_SIZE),
-  flash: createAction(FLASH),
-  finishJob: createAction(FINISH_JOB)
+export type Machine = Model
+
+export type Laundry = Model
+
+export type User = Model
+
+export type Booking = Model
+
+export type Config = {}
+
+
+export type ListMachinesAction = {
+  type: 'LIST_MACHINES',
+  payload: Machine[]
 }
+
+export type CreateMachineAction = {
+  type: 'CREATE_MACHINE',
+  payload: Machine
+}
+
+export type ListLaundriesAction = {
+  type: 'LIST_LAUNDRIES',
+  payload: Laundry[]
+}
+
+export type SignInUserAction = {
+  type: 'SIGN_IN_USER',
+  payload: User
+}
+
+export type UpdateUserAction = {
+  type: 'UPDATE_USER',
+  payload: User
+}
+
+export type CreateLaundryAction = {
+  type: 'CREATE_LAUNDRY',
+  payload: Laundry
+}
+
+export type UpdateLaundryAction = {
+  type: 'UPDATE_LAUNDRY',
+  payload: Laundry
+}
+
+export type UpdateMachineAction = {
+  type: 'UPDATE_MACHINE',
+  payload: Machine
+}
+
+export type DeleteMachineAction = {
+  type: 'DELETE_MACHINE',
+  payload: string
+}
+export type DeleteLaundryAction = {
+  type: 'DELETE_MACHINE',
+  payload: string
+}
+
+export type ConfigureAction = {
+  type: 'CONFIGURE',
+  payload: Config
+}
+
+export type UpdateBookingAction = {
+  type: 'UPDATE_BOOKING',
+  payload: Booking
+}
+
+export type CreateBookingAction = {
+  type: 'CREATE_BOOKING',
+  payload: Booking
+}
+export type DeleteBookingAction = {
+  type: 'DELETE_BOOKING',
+  payload: string
+}
+
+export type ListBookingsAction = {
+  type: 'LIST_BOOKINGS',
+  payload: Booking[]
+}
+
+export type ListUsersAction = {
+  type: 'LIST_USERS',
+  payload: User[]
+}
+
+export type State = {
+  users: {[string]: User},
+  userList: string[],
+  userListSize: number,
+  currentUser: string,
+  flash: ???,
+  laundries: {[string]: Laundry},
+  laundryList: string[],
+  laundryListSize: number,
+  machines: {[string]: Machine},
+  bookings: {[string]: Booking},
+  userBookings: string[],
+  invites: {[string]: Invite},
+  stats: Stats,
+  jobs: number,
+  config: Config
+}
+
+/*
+ LIST_BOOKINGS_FOR_USER,
+ CREATE_INVITATION,
+ LIST_INVITATIONS,
+ DELETE_INVITATION,
+ UPDATE_INVITATION,
+ UPDATE_STATS,
+ UPDATE_LAUNDRY_LIST_SIZE,
+ UPDATE_USER_LIST_SIZE,
+ FINISH_JOB
+ */
+export type Action = ListMachinesAction
+  | CreateMachineAction
+  | ListLaundriesAction
+  | SignInUserAction
+  | UpdateUserAction
+  | CreateLaundryAction
+  | UpdateLaundryAction
+  | UpdateMachineAction
+  | DeleteMachineAction
+  | DeleteLaundryAction
+  | ConfigureAction
+  | UpdateBookingAction
+  | CreateBookingAction
+  | DeleteBookingAction
+  | ListBookingsAction
+  | ListUsersAction

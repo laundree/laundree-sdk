@@ -1,6 +1,4 @@
-/**
- * Created by budde on 25/06/16.
- */
+// @flow
 const {handleActions} = require('redux-actions')
 
 function assignImmutable (obj, key, value) {
@@ -23,7 +21,7 @@ function arrayToObject (array) {
  * @param {string[]} listActions Will replace state with given entries.
  * @param {Object.<string, Function>} mappers
  */
-function setupCollection (addActions, deleteActions = [], listActions = [], mappers = {}) {
+function setupCollection<T, S> (addActions: string[], deleteActions: string[] = [], listActions: string[] = [], mappers: { [string]: (T) => S } = {}) {
   const actionMap = {}
   addActions.forEach(action => {
     const mapper = mappers[action] || (p => p)
@@ -47,7 +45,7 @@ function setupCollection (addActions, deleteActions = [], listActions = [], mapp
   return handleActions(actionMap, {})
 }
 
-function setupList (listAction) {
+function setupList (listAction: string) {
   const actionMap = {}
   actionMap[listAction] = (state, {payload}) => payload.map(({id}) => id)
   return handleActions(actionMap, [])
