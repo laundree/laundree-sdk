@@ -4,7 +4,7 @@ import request from 'superagent'
 import EventEmitter from 'events'
 import url from 'url'
 import type { Store } from 'redux'
-import type { Action, State } from './redux/actions'
+import type { Action, State } from './redux'
 
 let jobId = 1
 
@@ -58,7 +58,7 @@ type LaundryModifier = {
   }
 }
 
-class Sdk {
+export class Sdk {
   api = {
     user: new UserSdk(this),
     machine: new MachineSdk(this),
@@ -82,7 +82,11 @@ class Sdk {
   setupRedux (store: Store<State, Action>, socket: Socket) {
     this.socket = socket
     store.subscribe(() => {
-      this.jobEventEmitter.emit(store.getState().jobs.toString())
+      const job = store.getState().job
+      if (!job && job !== 0) {
+        return
+      }
+      this.jobEventEmitter.emit(job.toString())
     })
   }
 
@@ -397,5 +401,3 @@ class BookingSdk extends ResourceSdk {
     super('bookings', sdk)
   }
 }
-
-module.exports = Sdk

@@ -1,5 +1,6 @@
 // @flow
-import Sdk from './sdk'
-import redux from './redux'
 
-export {Sdk, redux}
+export * from './sdk'
+import * as r from './redux'
+export const redux = r
+
