@@ -70,7 +70,6 @@ export type Booking = Model
 
 export type Config = {}
 
-
 export type ListMachinesAction = {
   type: 'LIST_MACHINES',
   payload: Machine[]
@@ -149,12 +148,36 @@ export type ListUsersAction = {
   payload: User[]
 }
 
+type Stats = {
+  demoLaundryCount: number,
+  demoUserCount: number,
+  laundryCount: number,
+  userCount: number,
+  bookingCount: number,
+  machineCount: number
+}
+
+type Flash = {
+  type: string,
+  message: string
+}
+
+type Invite = Model & {
+  used: boolean,
+  email: string,
+  laundry: string
+}
+
+export type UsersState = {[string]: User}
+
+export type UserListState = string[]
+
 export type State = {
   users: {[string]: User},
-  userList: string[],
+  userList: UserListState,
   userListSize: number,
   currentUser: string,
-  flash: ???,
+  flash: Flash[],
   laundries: {[string]: Laundry},
   laundryList: string[],
   laundryListSize: number,

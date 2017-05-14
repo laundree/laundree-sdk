@@ -4,8 +4,7 @@ import request from 'superagent'
 import EventEmitter from 'events'
 import url from 'url'
 import type { Store } from 'redux'
-import type { Action } from './redux/actions'
-import type { State } from './redux/state'
+import type { Action, State } from './redux/actions'
 
 let jobId = 1
 
@@ -83,7 +82,7 @@ class Sdk {
   setupRedux (store: Store<State, Action>, socket: Socket) {
     this.socket = socket
     store.subscribe(() => {
-      this.jobEventEmitter.emit(store.getState().jobs)
+      this.jobEventEmitter.emit(store.getState().jobs.toString())
     })
   }
 

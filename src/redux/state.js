@@ -1,13 +1,31 @@
 // @flow
-import {combineReducers} from 'redux'
-import {setupSingleton, setupList, setupCollection} from './reducers/helpers'
-import {types} from './actions'
+import { combineReducers } from 'redux'
+import { setupSingleton, setupList, setupCollection } from './reducers/helpers'
+import { types } from './actions'
 import userBookings from './reducers/userBookings'
+import type { UsersState, Action, UserListState } from './actions'
 
-const users = setupCollection(
-  [types.SIGN_IN_USER, types.UPDATE_USER],
-  [],
-  [types.LIST_USERS])
+function users (s: UsersState, a: Action): UsersState {
+  switch (a.type) {
+    case types.SIGN_IN_USER:
+    case types.UPDATE_USER:
+      return {...s, [a.payload.id]: a.payload}
+    case types.LIST_USERS:
+      return a.payload.reduce((m, u) => ({...m, [u.id]: u}), s)
+    default:
+      return s
+  }
+}
+
+function userList (s: UserListState, a: Action): UserListState {
+  switch (a.type) {
+    case types.LIST_USERS:
+      return a.payload.map(({id}) => id)
+    default:
+      return s
+  }
+}
+
 
 const laundries = setupCollection(
   [types.UPDATE_LAUNDRY, types.CREATE_LAUNDRY],
@@ -35,7 +53,7 @@ const invites = setupCollection(
 
 export default combineReducers({
   users,
-  userList: setupList(types.LIST_USERS),
+  userList,
   userListSize: setupSingleton(types.UPDATE_USER_LIST_SIZE),
   currentUser: setupSingleton(types.SIGN_IN_USER, null, p => p.id),
   flash: setupSingleton(types.FLASH, [], (payload, state) => state.concat([payload])),
