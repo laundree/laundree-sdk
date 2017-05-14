@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Change redux
+- Add flow
+- Refactor sdk
+
 ## [0.0.23]
 
 - Add `addOneSignalPlayerId`
