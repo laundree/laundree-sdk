@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add babel
 - Change redux
 - Add flow
 - Refactor sdk

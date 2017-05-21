@@ -2,9 +2,11 @@
   "name": "laundree-sdk",
   "version": "0.0.23",
   "description": "An sdk for laundree.io",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "eslint ."
+    "prepublish": "npm build",
+    "test": "eslint .",
+    "build": "babel src -d lib --copy-files"
   },
   "repository": {
     "type": "git",
@@ -25,6 +27,10 @@
     "superagent": "^3.4.4"
   },
   "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.4.0",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-stage-0": "^6.24.1",
     "eslint": "^3.8.1",
     "eslint-config-standard": "^6.0.0",
     "eslint-config-standard-flow": "^1.0.1",

@@ -26,46 +26,53 @@ const UPDATE_STATS = 'UPDATE_STATS'
 const FINISH_JOB = 'FINISH_JOB'
 const CONFIGURE = 'CONFIGURE'
 
-export const types = {
-  LIST_MACHINES,
-  CREATE_MACHINE,
-  LIST_LAUNDRIES,
-  SIGN_IN_USER,
-  FLASH,
-  UPDATE_USER,
-  CREATE_LAUNDRY,
-  UPDATE_MACHINE,
-  DELETE_MACHINE,
-  DELETE_LAUNDRY,
-  UPDATE_LAUNDRY,
-  UPDATE_BOOKING,
-  CREATE_BOOKING,
-  DELETE_BOOKING,
-  LIST_BOOKINGS,
-  LIST_BOOKINGS_FOR_USER,
-  LIST_USERS,
-  CREATE_INVITATION,
-  LIST_INVITATIONS,
-  DELETE_INVITATION,
-  UPDATE_INVITATION,
-  UPDATE_STATS,
-  FINISH_JOB,
-  CONFIGURE
+export type MachineType = 'wash' | 'dry'
+
+export type Machine = {|
+  id: string,
+  type: MachineType,
+  name: string,
+  broken: boolean
+|}
+export type LaundryRules = {
+  limit?: number,
+  dailyLimit?: number,
+  timeLimit?: {
+    from: { hour: number, minute: number },
+    to: { hour: number, minute: number }
+  }
 }
 
-export type Model = {
-  id: string
-}
+export type Laundry = {|
+  id: string,
+  name: string,
+  machines: string[],
+  users: string[],
+  owners: string[],
+  invites: string[],
+  timezone: string,
+  googlePlaceId: string,
+  demo: boolean,
+  rules: LaundryRules
+|}
 
-export type Machine = Model
+export type User = {|
+  id: string,
+  photo: string,
+  displayName: string,
+  laundries: string[],
+  lastSeen: string,
+  role: 'user' | 'admin',
+  demo: boolean
+|}
 
-export type Laundry = Model
-
-export type User = Model
-
-export type Booking = Model & {
-  owner: string
-}
+export type Booking = {|
+  id: string,
+  owner: string,
+  from: string,
+  to: string,
+  machine: string
+|}
 
 export type Config = {}
 
@@ -114,7 +121,7 @@ export type DeleteMachineAction = {
   payload: string
 }
 export type DeleteLaundryAction = {
-  type: 'DELETE_MACHINE',
+  type: 'DELETE_LAUNDRY',
   payload: string
 }
 
@@ -162,32 +169,53 @@ export type FlashAction = {
   payload: Flash
 }
 
+export type CreateInvitationAction = {
+  type: 'CREATE_INVITATION',
+  payload: Invite
+}
+
+export type UpdateInvitationAction = {
+  type: 'UPDATE_INVITATION',
+  payload: Invite
+}
+
+export type DeleteInvitationAction = {
+  type: 'DELETE_INVITATION',
+  payload: string
+}
+
+export type ListInvitationsAction = {
+  type: 'LIST_INVITATIONS',
+  payload: Invite[]
+}
+
 export type ListBookingsForUserAction = {
   type: 'LIST_BOOKINGS_FOR_USER',
   payload: { bookings: Booking[], user: string }
 }
 
-export type Stats = {
+export type Stats = {|
   demoLaundryCount: number,
   demoUserCount: number,
   laundryCount: number,
   userCount: number,
   bookingCount: number,
   machineCount: number
-}
+|}
 
-export type Flash = {
+export type Flash = {|
   type: string,
   message: string
-}
+|}
 
-export type Invite = Model & {
+export type Invite = {|
+  id: string,
   used: boolean,
   email: string,
   laundry: string
-}
+|}
 
-export type State = {
+export type State = {|
   users: { [string]: User },
   userList: string[],
   currentUser: ?string,
@@ -201,15 +229,8 @@ export type State = {
   stats: ?Stats,
   job: ?number,
   config: ?Config
-}
+|}
 
-/*
- LIST_BOOKINGS_FOR_USER,
- CREATE_INVITATION,
- LIST_INVITATIONS,
- DELETE_INVITATION,
- UPDATE_INVITATION,
- */
 export type Action = ListMachinesAction
   | CreateMachineAction
   | ListLaundriesAction
@@ -230,76 +251,80 @@ export type Action = ListMachinesAction
   | FinishJobAction
   | FlashAction
   | ListBookingsForUserAction
+  | CreateInvitationAction
+  | UpdateInvitationAction
+  | DeleteInvitationAction
+  | ListInvitationsAction
 
-function users (s: { [string]: User }, a: Action) {
+function users (s: { [string]: User } = {}, a: Action) {
   switch (a.type) {
-    case types.SIGN_IN_USER:
-    case types.UPDATE_USER:
+    case SIGN_IN_USER:
+    case UPDATE_USER:
       return {...s, [a.payload.id]: a.payload}
-    case types.LIST_USERS:
+    case LIST_USERS:
       return a.payload.reduce((m, u) => ({...m, [u.id]: u}), s)
     default:
       return s
   }
 }
 
-function userList (s: string[], a: Action): string[] {
+function userList (s: string[] = [], a: Action): string[] {
   switch (a.type) {
-    case types.LIST_USERS:
+    case LIST_USERS:
       return a.payload.map(({id}) => id)
     default:
       return s
   }
 }
-function laundryList (s: string[], a: Action) {
+function laundryList (s: string[] = [], a: Action) {
   switch (a.type) {
-    case types.LIST_LAUNDRIES:
+    case LIST_LAUNDRIES:
       return a.payload.map(({id}) => id)
     default:
       return s
   }
 }
 
-function job (state: number, action: Action) {
-  if (action.type === types.FINISH_JOB) {
+function job (state: ?number = null, action: Action) {
+  if (action.type === FINISH_JOB) {
     return action.payload
   }
   return state
 }
 
-function stats (state: Stats, action: Action) {
-  if (action.type === types.UPDATE_STATS) {
+function stats (state: ?Stats = null, action: Action) {
+  if (action.type === UPDATE_STATS) {
     return action.payload
   }
   return state
 }
 
-function config (state: {}, action: Action) {
-  if (action.type === types.CONFIGURE) {
+function config (state: {} = {}, action: Action) {
+  if (action.type === CONFIGURE) {
     return action.payload
   }
   return state
 }
 
-function flash (state: Flash[], action: Action) {
-  if (action.type === types.FLASH) {
+function flash (state: Flash[] = [], action: Action) {
+  if (action.type === FLASH) {
     return [...state, action.payload]
   }
   return state
 }
 
-function currentUser (state: string, action: Action): string {
-  return action.type === types.SIGN_IN_USER ? action.payload.id : state
+function currentUser (state: ?string = null, action: Action) {
+  return action.type === SIGN_IN_USER ? action.payload.id : state
 }
 
-function laundries (state: { [string]: Laundry }, action: Action): { [string]: Laundry } {
+function laundries (state: { [string]: Laundry } = {}, action: Action): { [string]: Laundry } {
   switch (action.type) {
-    case types.UPDATE_LAUNDRY:
-    case types.CREATE_LAUNDRY:
+    case UPDATE_LAUNDRY:
+    case CREATE_LAUNDRY:
       return {...state, [action.payload.id]: action.payload}
-    case types.LIST_LAUNDRIES:
+    case LIST_LAUNDRIES:
       return action.payload.reduce((state, laundry) => ({...state, [laundry.id]: laundry}), state)
-    case types.DELETE_LAUNDRY:
+    case DELETE_LAUNDRY:
       const s = {...state}
       delete s[action.payload]
       return s
@@ -307,14 +332,14 @@ function laundries (state: { [string]: Laundry }, action: Action): { [string]: L
       return state
   }
 }
-function machines (state: { [string]: Machine }, action: Action): { [string]: Machine } {
+function machines (state: { [string]: Machine } = {}, action: Action): { [string]: Machine } {
   switch (action.type) {
-    case types.UPDATE_MACHINE:
-    case types.CREATE_MACHINE:
+    case UPDATE_MACHINE:
+    case CREATE_MACHINE:
       return {...state, [action.payload.id]: action.payload}
-    case types.LIST_MACHINES:
+    case LIST_MACHINES:
       return action.payload.reduce((state, machine) => ({...state, [machine.id]: machine}), state)
-    case types.DELETE_MACHINE:
+    case DELETE_MACHINE:
       const s = {...state}
       delete s[action.payload]
       return s
@@ -323,14 +348,14 @@ function machines (state: { [string]: Machine }, action: Action): { [string]: Ma
   }
 }
 
-function invites (state: { [string]: Invite }, action: Action): { [string]: Invite } {
+function invites (state: { [string]: Invite } = {}, action: Action): { [string]: Invite } {
   switch (action.type) {
-    case types.UPDATE_INVITATION:
-    case types.CREATE_INVITATION:
+    case UPDATE_INVITATION:
+    case CREATE_INVITATION:
       return {...state, [action.payload.id]: action.payload}
-    case types.LIST_INVITATIONS:
+    case LIST_INVITATIONS:
       return action.payload.reduce((state, machine) => ({...state, [machine.id]: machine}), state)
-    case types.DELETE_INVITATION:
+    case DELETE_INVITATION:
       const s = {...state}
       delete s[action.payload]
       return s
@@ -339,16 +364,16 @@ function invites (state: { [string]: Invite }, action: Action): { [string]: Invi
   }
 }
 
-function bookings (state: { [string]: Booking }, action: Action): { [string]: Booking } {
+function bookings (state: { [string]: Booking } = {}, action: Action): { [string]: Booking } {
   switch (action.type) {
-    case types.UPDATE_BOOKING:
-    case types.CREATE_BOOKING:
+    case UPDATE_BOOKING:
+    case CREATE_BOOKING:
       return {...state, [action.payload.id]: action.payload}
-    case types.LIST_BOOKINGS:
+    case LIST_BOOKINGS:
       return action.payload.reduce((state, booking) => ({...state, [booking.id]: booking}), state)
-    case types.LIST_BOOKINGS_FOR_USER:
+    case LIST_BOOKINGS_FOR_USER:
       return action.payload.bookings.reduce((state, booking) => ({...state, [booking.id]: booking}), state)
-    case types.DELETE_BOOKING:
+    case DELETE_BOOKING:
       const s = {...state}
       delete s[action.payload]
       return s
@@ -357,11 +382,11 @@ function bookings (state: { [string]: Booking }, action: Action): { [string]: Bo
   }
 }
 
-function userBookings (state: ?{ bookings: string[], user: string }, action: Action) {
+function userBookings (state: ?{ bookings: string[], user: string } = null, action: Action) {
   switch (action.type) {
-    case types.LIST_BOOKINGS_FOR_USER:
+    case LIST_BOOKINGS_FOR_USER:
       return {user: action.payload.user, bookings: action.payload.bookings.map(({id}) => id)}
-    case types.CREATE_BOOKING:
+    case CREATE_BOOKING:
       if (!state) {
         return null
       }
@@ -369,7 +394,7 @@ function userBookings (state: ?{ bookings: string[], user: string }, action: Act
         return state
       }
       return {user: state.user, bookings: [...state.bookings, action.payload.id]}
-    case types.DELETE_BOOKING:
+    case DELETE_BOOKING:
       if (!state) {
         return null
       }
@@ -395,19 +420,3 @@ export const reducer: (State, Action) => State = combineReducers({
   job,
   config
 })
-
-export const initState: State = {
-  bookings: {},
-  config: {},
-  currentUser: null,
-  flash: [],
-  laundries: {},
-  laundryList: [],
-  machines: {},
-  userBookings: null,
-  invites: {},
-  stats: null,
-  job: null,
-  userList: [],
-  users: {}
-}
