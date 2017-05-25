@@ -383,7 +383,7 @@ class ContactSdk extends ResourceSdk {
     super('contact', sdk)
   }
 
-  sendMessage ({name, email, subject, message}: { name: string, email: string, subject: string, message: string }) {
+  sendMessage ({name, email, subject, message}: { name?: string, email?: string, subject: string, message: string }) {
     return this._post(this.baseUrl + '/api/contact', {name, email, subject, message})
   }
 }
