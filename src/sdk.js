@@ -76,14 +76,14 @@ export type LaundryModifier = {
 }
 
 export class Sdk {
-  api = {
-    user: new UserSdk(this),
-    machine: new MachineSdk(this),
-    laundry: new LaundrySdk(this),
-    invite: new InviteSdk(this),
-    booking: new BookingSdk(this),
-    token: new TokenSdk(this),
-    contact: new ContactSdk(this)
+  api: {
+    user: UserSdk,
+    machine: MachineSdk,
+    laundry: LaundrySdk,
+    invite: InviteSdk,
+    booking: BookingSdk,
+    token: TokenSdk,
+    contact: ContactSdk
   }
   baseUrl: string
   jobEventEmitter: EventEmitter
@@ -91,9 +91,17 @@ export class Sdk {
   auth: ?{ userId: string, token: string }
   jobEventEmitter = new EventEmitter()
 
-  constructor (baseUrl: string = '') {
-    const {protocol, host} = url.parse(baseUrl)
-    this.baseUrl = (protocol && host) ? `${protocol}://${host}` : ''
+  constructor (baseUrl: string = '/') {
+    this.baseUrl = baseUrl
+    this.api = {
+      user: new UserSdk(this),
+      machine: new MachineSdk(this),
+      laundry: new LaundrySdk(this),
+      invite: new InviteSdk(this),
+      booking: new BookingSdk(this),
+      token: new TokenSdk(this),
+      contact: new ContactSdk(this)
+    }
   }
 
   setupRedux (store: Store<State, Action>, socket: Socket) {

@@ -1,5 +1,7 @@
 # Changelog
 
+- Fix baseUrl bug
+
 ## [0.1.0]
 
 - Add babel
