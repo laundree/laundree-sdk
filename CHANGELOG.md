@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.1.2]
+
 - Fix remove unused import
 
 ## [0.1.1]
