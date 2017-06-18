@@ -2,7 +2,6 @@
 
 import request from 'superagent'
 import EventEmitter from 'events'
-import url from 'url'
 import type { Store } from 'redux'
 import type { Action, State } from './redux'
 
