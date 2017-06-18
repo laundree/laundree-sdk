@@ -1,11 +1,10 @@
 language: node_js
 node_js:
-- '8'
+- '7'
 cache:
   directories:
   - node_modules
 script:
-- npm cache verify
 - npm install
 - echo "$NPM_SECRET" >> ~/.npmrc
 - npm test
