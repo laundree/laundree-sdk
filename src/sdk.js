@@ -12,40 +12,57 @@ type Socket = {
   emit: () => void
 }
 
-type ListOptions = { q?: string, showDemo?: boolean, skip?: number, limit?: number }
+export type ListOptions = { q?: string, showDemo?: boolean, skip?: number, limit?: number }
 
 type LaundryType = 'wash' | 'dry'
 
-type Time = {
-  hour: 0
-    | 1
-    | 2
-    | 3
-    | 4
-    | 5
-    | 6
-    | 7
-    | 8
-    | 9
-    | 10
-    | 11
-    | 12
-    | 13
-    | 14
-    | 15
-    | 16
-    | 17
-    | 18
-    | 19
-    | 20
-    | 21
-    | 22
-    | 23,
-  minute: 0
-    | 30
+export type Hour = 0
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5
+  | 6
+  | 7
+  | 8
+  | 9
+  | 10
+  | 11
+  | 12
+  | 13
+  | 14
+  | 15
+  | 16
+  | 17
+  | 18
+  | 19
+  | 20
+  | 21
+  | 22
+  | 23
+
+export type DateTimeObject = {
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute: number
 }
 
-type LaundryModifier = {
+export type DateObject = {
+  year: number,
+  month: number,
+  day: number
+}
+
+export type Minute = 0 | 30
+
+export type Time = {
+  hour: Hour,
+  minute: Minute
+}
+
+export type LaundryModifier = {
   name?: string,
   googlePlaceId?: string,
   rules?: {
@@ -104,7 +121,7 @@ export class Sdk {
     this.auth = !(userId && token) ? null : {userId, token}
   }
 
-  listBookingsInTime (laundryId: string, from: Date, to: Date) {
+  listBookingsInTime (laundryId: string, from: DateObject, to: DateObject) {
     return this.emit('listBookingsInTime', laundryId, from, to)
   }
 
@@ -292,7 +309,7 @@ class MachineSdk extends ResourceSdk {
     return this._put(`${this.baseUrl}/api/machines/${id}`, params)
   }
 
-  createBooking (id: string, from: Date, to: Date) {
+  createBooking (id: string, from: DateTimeObject, to: DateTimeObject) {
     return this._post(`${this.baseUrl}/api/machines/${id}/bookings`, {from, to})
   }
 }

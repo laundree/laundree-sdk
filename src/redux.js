@@ -34,12 +34,15 @@ export type Machine = {|
   name: string,
   broken: boolean
 |}
+
+export type Time = { hour: number, minute: number }
+
 export type LaundryRules = {
   limit?: number,
   dailyLimit?: number,
   timeLimit?: {
-    from: { hour: number, minute: number },
-    to: { hour: number, minute: number }
+    from: Time,
+    to: Time
   }
 }
 
@@ -228,7 +231,7 @@ export type State = {|
   invites: { [string]: Invite },
   stats: ?Stats,
   job: ?number,
-  config: ?Config
+  config: Config
 |}
 
 export type Action = ListMachinesAction
