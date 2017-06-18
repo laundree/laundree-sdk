@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.1.1]
+
 - Fix baseUrl bug
 
 ## [0.1.0]
