@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "prepublish": "npm run build",
-    "test": "eslint .",
+    "test": "eslint . && flow",
     "build": "babel src -d lib --copy-files && flow-copy-source src lib"
   },
   "repository": {
