@@ -7,6 +7,7 @@
     "node": true
   },
   "rules": {
-    "no-var": "error"
+    "no-var": "error",
+    "no-undef": 0
   }
 }

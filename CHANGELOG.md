@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Update dependencies
+
 ## [0.1.3]
 
 - Make update-auth argument optional

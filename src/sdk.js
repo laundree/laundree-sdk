@@ -235,7 +235,6 @@ class ResourceSdk {
 }
 
 class UserSdk extends ResourceSdk {
-
   constructor (sdk: Sdk) {
     super('users', sdk)
   }
@@ -303,11 +302,9 @@ class UserSdk extends ResourceSdk {
   _startEmailVerification (id: string, email: string) {
     return this._post(`${this.baseUrl}/api/users/${id}/start-email-verification`, {email})
   }
-
 }
 
 class MachineSdk extends ResourceSdk {
-
   constructor (sdk: Sdk) {
     super('machines', sdk)
   }
@@ -322,7 +319,6 @@ class MachineSdk extends ResourceSdk {
 }
 
 class TokenSdk extends ResourceSdk {
-
   constructor (sdk: Sdk) {
     super('tokens', sdk)
   }
@@ -350,7 +346,6 @@ class TokenSdk extends ResourceSdk {
 }
 
 class LaundrySdk extends ResourceSdk {
-
   constructor (sdk: Sdk) {
     super('laundries', sdk)
   }
@@ -413,14 +408,12 @@ class ContactSdk extends ResourceSdk {
 }
 
 class InviteSdk extends ResourceSdk {
-
   constructor (sdk: Sdk) {
     super('invites', sdk)
   }
 }
 
 class BookingSdk extends ResourceSdk {
-
   constructor (sdk: Sdk) {
     super('bookings', sdk)
   }
