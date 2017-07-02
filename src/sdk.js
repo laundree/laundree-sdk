@@ -124,8 +124,8 @@ export class Sdk {
     })
   }
 
-  updateAuth ({userId, token}: { userId: string, token: string }) {
-    this.auth = !(userId && token) ? null : {userId, token}
+  updateAuth (auth?: { userId: string, token: string }) {
+    this.auth = auth || null
   }
 
   listBookingsInTime (laundryId: string, from: DateObject, to: DateObject) {

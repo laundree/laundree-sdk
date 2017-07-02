@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Make update-auth argument optional
+
 ## [0.1.2]
 
 - Fix remove unused import
