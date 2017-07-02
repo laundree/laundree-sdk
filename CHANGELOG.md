@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.1.3]
+
 - Make update-auth argument optional
 
 ## [0.1.2]
