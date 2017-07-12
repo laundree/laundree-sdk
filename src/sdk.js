@@ -73,6 +73,10 @@ export type LaundryModifier = {
     }
   }
 }
+export type BookingModifier = {
+  from?: DateTimeObject,
+  to?: DateTimeObject
+}
 
 export class Sdk {
   api: {
@@ -416,5 +420,9 @@ class InviteSdk extends ResourceSdk {
 class BookingSdk extends ResourceSdk {
   constructor (sdk: Sdk) {
     super('bookings', sdk)
+  }
+
+  updateBooking (id: string, dates: BookingModifier) {
+    return this._put(`${this.baseUrl}/api/booking/${id}`, dates)
   }
 }

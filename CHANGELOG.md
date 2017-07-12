@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Update dependencies
+- Add update booking endpoint
 
 ## [0.1.3]
 
