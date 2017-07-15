@@ -2,8 +2,9 @@
 
 ## Unreleased
 
-- Fix wrong endpoint
+## [0.1.5]
 
+- Fix wrong endpoint
 
 ## [0.1.4]
 
