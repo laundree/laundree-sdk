@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Fix wrong endpoint
+
+
 ## [0.1.4]
 
 - Update dependencies

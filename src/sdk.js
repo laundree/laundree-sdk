@@ -423,6 +423,6 @@ class BookingSdk extends ResourceSdk {
   }
 
   updateBooking (id: string, dates: BookingModifier) {
-    return this._put(`${this.baseUrl}/api/booking/${id}`, dates)
+    return this._put(`${this.baseUrl}/api/bookings/${id}`, dates)
   }
 }
