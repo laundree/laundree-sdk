@@ -4,6 +4,13 @@ import request from 'superagent'
 import EventEmitter from 'events'
 import type { Store } from 'redux'
 import type { Action, State } from './redux'
+import type { MachineType as MT, UserRole as UR, LocaleType as LT, LaundryRules as LR, Time as T } from './types'
+
+export type Time = T
+export type MachineType = MT
+export type UserRole = UR
+export type LocaleType = LT
+export type LaundryRules = LR
 
 let jobId = 1
 
@@ -11,34 +18,151 @@ type Socket = {
   emit: () => void
 }
 
+type Summary = { id: string, href: string }
+
+export type User = {|
+  id: string,
+  photo: string,
+  displayName: string,
+  name: Name,
+  href: string,
+  locale: LocaleType,
+  lastSeen?: string,
+  laundries: Summary[],
+  tokens: Summary[],
+  demo: boolean,
+  role: UserRole
+|}
+
+export type Booking = {|
+  id: string,
+  href: string,
+  from: DateTimeObject,
+  to: DateTimeObject
+|}
+
+export type Token = {|
+  id: string,
+  href: string,
+  name: string,
+  owner: Summary
+|}
+
+export type TokenWithSecret = {|
+  id: string,
+  href: string,
+  name: string,
+  owner: Summary,
+  secret: string
+|}
+
+export type Laundry = {|
+  id: string,
+  href: string,
+  name: string,
+  owners: Summary[],
+  users: Summary[],
+  machines: Summary[],
+  invites: Summary[],
+  timezone: string,
+  googlePlaceId: string,
+  demo: boolean,
+  rules: LaundryRules
+|}
+
+export type Machine = {|
+  id: string,
+  href: string,
+  name: string,
+  type: MachineType,
+  broken: boolean
+|}
+
+export type LaundryInvitation = {|
+  id: string,
+  href: string,
+  email: string,
+  laundry: Summary
+|}
+
+export type Resource = User | Booking | Token | Laundry | Machine | Booking | LaundryInvitation
+
+export type ValidateCredentialsResult = {| userId: string, emailVerified: boolean |}
+
+export type CreateDemoLaundryResult = {| email: string, password: string |}
+
+export type CreateInviteCodeResult = {| key: string, href: string |}
+
+export type ApiResult =
+  Resource
+  | TokenWithSecret
+  | ValidateCredentialsResult
+  | CreateDemoLaundryResult
+  | CreateInviteCodeResult
+  | Summary[]
+
 export type ListOptions = { q?: string, showDemo?: boolean, skip?: number, limit?: number }
 
-type LaundryType = 'wash' | 'dry'
+export type CreateUserBody = { displayName: string, email: string, password: string }
 
-export type Hour = 0
-  | 1
-  | 2
-  | 3
-  | 4
-  | 5
-  | 6
-  | 7
-  | 8
-  | 9
-  | 10
-  | 11
-  | 12
-  | 13
-  | 14
-  | 15
-  | 16
-  | 17
-  | 18
-  | 19
-  | 20
-  | 21
-  | 22
-  | 23
+export type CreateBookingBody = { from: DateTimeObject, to: DateTimeObject }
+
+export type UpdateBookingBody = { from?: DateTimeObject, to?: DateTimeObject }
+
+export type ContactBody = { message: string, subject: string, name?: string, email?: string, locale?: LocaleType }
+
+export type CreateLaundryBody = { name: string, googlePlaceId: string }
+
+export type InviteUserByEmailBody = { email: string, locale?: LocaleType }
+
+export type UpdateLaundryBody = {
+  name?: string,
+  googlePlaceId?: string,
+  rules?: LaundryRules
+}
+
+export type AddUserFromCodeBody = { key: string }
+
+export type CreateMachineBody = { broken: boolean, type: MachineType, name: string }
+
+export type UpdateMachineBody = { broken?: boolean, type?: MachineType, name?: string }
+
+export type CreateTokenBody = { name: string }
+
+export type CreateTokenFromEmailPasswordBody = { name: string, email: string, password: string }
+
+export type StartPasswordResetBody = { locale?: LocaleType }
+
+export type PasswordResetBody = { token: string, password: string }
+
+export type StartEmailVerificationBody = { email: string, locale?: LocaleType }
+
+export type VerifyEmailBody = { email: string, token: string }
+
+export type UpdateUserBody = { name?: string, locale?: LocaleType }
+
+export type ChangeUserPasswordBody = { currentPassword: string, newPassword: string }
+
+export type AddOneSignalPlayerIdBody = { playerId: string }
+
+export type ValidateCredentialsBody = { email: string, password: string }
+
+export type VerifyInviteCodeBody = { key: string }
+
+type Name = {
+  familyName?: string,
+  givenName?: string,
+  middleName?: string
+}
+
+export type CreateUserFromProfileBody = {
+  provider: string,
+  id: string,
+  displayName: string,
+  name: Name,
+  emails: { value: string, type?: string }[],
+  photos?: { value: string }[]
+}
 
 export type DateTimeObject = {
   year: number,
@@ -54,29 +178,11 @@ export type DateObject = {
   day: number
 }
 
-export type Minute = 0 | 30
+type AuthenticatorStrategy = { type: 'bearer', token: string }
+  | { type: 'basic', username: string, password: string }
+  | { type: 'unauthenticated' }
 
-export type Time = {
-  hour: Hour,
-  minute: Minute
-}
-
-export type LaundryModifier = {
-  name?: string,
-  googlePlaceId?: string,
-  rules?: {
-    limit?: number,
-    dailyLimit?: number,
-    timeLimit?: {
-      from: Time,
-      to: Time
-    }
-  }
-}
-export type BookingModifier = {
-  from?: DateTimeObject,
-  to?: DateTimeObject
-}
+type Authenticator = () => Promise<AuthenticatorStrategy>
 
 export class Sdk {
   api: {
@@ -91,10 +197,10 @@ export class Sdk {
   baseUrl: string
   jobEventEmitter: EventEmitter
   socket: any
-  auth: ?{ userId: string, token: string }
   jobEventEmitter = new EventEmitter()
+  authenticator: Authenticator
 
-  constructor (baseUrl: string = '/') {
+  constructor (baseUrl: string = '/api', authenticator: Authenticator = () => Promise.resolve({type: 'unauthenticated'})) {
     this.baseUrl = baseUrl
     this.api = {
       user: new UserSdk(this),
@@ -105,6 +211,7 @@ export class Sdk {
       token: new TokenSdk(this),
       contact: new ContactSdk(this)
     }
+    this.authenticator = authenticator
   }
 
   setupRedux (store: Store<State, Action>, socket: Socket) {
@@ -126,10 +233,6 @@ export class Sdk {
       this.jobEventEmitter.once(jId.toString(), resolve)
       this.socket.emit(...newArgs)
     })
-  }
-
-  updateAuth (auth?: { userId: string, token: string }) {
-    this.auth = auth || null
   }
 
   listBookingsInTime (laundryId: string, from: DateObject, to: DateObject) {
@@ -178,8 +281,17 @@ export class Sdk {
 
   async _req (method: 'get' | 'post' | 'put' | 'delete', path: string, data: ?{} = null) {
     let req = request[method](path)
+    const authStrategy = await this.authenticator()
+    switch (authStrategy.type) {
+      case 'unauthenticated':
+        break
+      case 'basic':
+        req = req.set('Authorization', `Basic ${Buffer.from(`${authStrategy.username}:${authStrategy.password}`).toString('base64')}`)
+        break
+      case 'bearer':
+        req = req.set('Authorization', `Bearer ${authStrategy.token}`)
+    }
     if (this.auth) {
-      req = req.set('Authorization', `Basic ${Buffer.from(`${this.auth.userId}:${this.auth.token}`).toString('base64')}`)
     }
     if (!data) return req.then()
     return req.send(data)
@@ -202,7 +314,7 @@ export class Sdk {
   }
 }
 
-class ResourceSdk {
+class ResourceSdk<R: Resource> {
   sdk: Sdk
   resourcePath: string
   baseUrl: string
@@ -229,175 +341,188 @@ class ResourceSdk {
     return this.sdk._post(path, data)
   }
 
-  async get (id: string) {
-    return this.sdk._get(`${this.baseUrl}/api/${this.resourcePath}/${id}`).then(({body}) => body)
+  async get (id: string): Promise<R> {
+    const res = await this.sdk._get(`${this.baseUrl}/${this.resourcePath}/${id}`)
+    return res.body
   }
 
   async del (id: string) {
-    return this.sdk._del(`${this.baseUrl}/api/${this.resourcePath}/${id}`)
+    await this.sdk._del(`${this.baseUrl}/${this.resourcePath}/${id}`)
   }
 }
 
-class UserSdk extends ResourceSdk {
+class UserSdk extends ResourceSdk<User> {
   constructor (sdk: Sdk) {
     super('users', sdk)
   }
 
-  async fromEmail (email: string) {
-    const {body} = await this._get(`${this.baseUrl}/api/users?email=${encodeURIComponent(email)}`)
+  async verifyEmail (id: string, b: VerifyEmailBody): Promise<void> {
+    await this._post(`${this.baseUrl}/users/${id}/verify-email`, b)
+  }
+
+  async validateCredentials (b: ValidateCredentialsBody): Promise<ValidateCredentialsResult> {
+    const res = await this._post(`${this.baseUrl}/users/validate-credentials`, b)
+    return res.body
+  }
+
+  async createUserFromProfile (b: CreateUserFromProfileBody): Promise<User> {
+    const res = await this._post(`${this.baseUrl}/users/profile`, b)
+    return res.body
+  }
+
+  async fromEmail (email: string): Promise<?User> {
+    const {body} = await this._get(`${this.baseUrl}/users?email=${encodeURIComponent(email)}`)
     if (!body) return null
     if (body.length !== 1) return null
     return body[0]
   }
 
-  async createUser (displayName: string, email: string, password: string) {
-    const {body} = await this._post(`${this.baseUrl}/api/users`, {displayName, email, password})
-    if (!body) return null
+  async createUser (b: CreateUserBody): Promise<User> {
+    const {body} = await this._post(`${this.baseUrl}/users`, b)
     return body
   }
 
-  async signUpUser (name: string, email: string, password: string) {
-    const user = await this.createUser(name, email, password)
+  async signUpUser (b: { displayName: string, email: string, password: string, locale?: LocaleType }): Promise<User> {
+    const {displayName, email, password, locale} = b
+    const user = await this.createUser({displayName, email, password})
     if (!user) {
       throw new Error('Failed to create user')
     }
-    return new UserSdk(this.sdk)._startEmailVerification(user.id, email)
+    await this._startEmailVerification(user.id, {email, locale})
+    return user
   }
 
-  async startEmailVerification (email: string) {
-    const user = await this.fromEmail(email)
+  async startEmailVerification (b: StartEmailVerificationBody): Promise<void> {
+    const user = await this.fromEmail(b.email)
     if (!user) throw new Error('User not found')
-    return new UserSdk(this.sdk)._startEmailVerification(user.id, email)
+    await this._startEmailVerification(user.id, b)
   }
 
-  forgotPassword (email: string) {
-    return this
-      .fromEmail(email)
-      .then(user => {
-        if (!user) throw new Error('User not found')
-        return new UserSdk(this.sdk).startPasswordReset(user.id)
-      })
+  async forgotPassword (p: { email: string, locale?: LocaleType }): Promise<void> {
+    const user = await this.fromEmail(p.email)
+    if (!user) throw new Error('User not found')
+    await this.startPasswordReset(user.id, p.locale ? {locale: p.locale} : {})
   }
 
-  async resetPassword (id: string, token: string, password: string) {
-    return this._post(`${this.baseUrl}/api/users/${id}/password-reset`, {token, password})
+  async resetPassword (id: string, body: PasswordResetBody): Promise<void> {
+    return this._post(`${this.baseUrl}/users/${id}/password-reset`, body)
   }
 
-  listEmails (id: string) {
-    return this._get(`${this.baseUrl}/api/users/${id}/emails`).then(({body}) => body)
+  async listEmails (id: string): Promise<string[]> {
+    const res = await this._get(`${this.baseUrl}/users/${id}/emails`)
+    return res.body
   }
 
-  addOneSignalPlayerId (id: string, playerId: string) {
-    return this._post(`${this.baseUrl}/api/users/${id}/one-signal-player-ids`, {playerId})
+  async addOneSignalPlayerId (id: string, body: AddOneSignalPlayerIdBody): Promise<void> {
+    await this._post(`${this.baseUrl}/users/${id}/one-signal-player-ids`, body)
   }
 
-  updateName (id: string, name: string) {
-    return this._put(`${this.baseUrl}/api/users/${id}`, {name})
+  async updateUser (id: string, body: UpdateUserBody): Promise<User> {
+    const {body: b} = await this._put(`${this.baseUrl}/users/${id}`, body)
+    return b
   }
 
-  changePassword (id: string, currentPassword: string, newPassword: string) {
-    return this._post(`${this.baseUrl}/api/users/${id}/password-change`, {currentPassword, newPassword})
+  async changePassword (id: string, body: ChangeUserPasswordBody): Promise<void> {
+    await this._post(`${this.baseUrl}/users/${id}/password-change`, body)
   }
 
-  startPasswordReset (id: string) {
-    return this._post(`${this.baseUrl}/api/users/${id}/start-password-reset`)
+  async startPasswordReset (id: string, b?: StartPasswordResetBody): Promise<void> {
+    await this._post(`${this.baseUrl}/users/${id}/start-password-reset`, b)
   }
 
-  _startEmailVerification (id: string, email: string) {
-    return this._post(`${this.baseUrl}/api/users/${id}/start-email-verification`, {email})
+  async _startEmailVerification (id: string, body: StartEmailVerificationBody): Promise<void> {
+    await this._post(`${this.baseUrl}/users/${id}/start-email-verification`, body)
   }
 }
 
-class MachineSdk extends ResourceSdk {
+class MachineSdk extends ResourceSdk<Machine> {
   constructor (sdk: Sdk) {
     super('machines', sdk)
   }
 
-  updateMachine (id: string, params: { name?: string, type?: LaundryType, broken?: boolean }) {
-    return this._put(`${this.baseUrl}/api/machines/${id}`, params)
+  updateMachine (id: string, params: UpdateMachineBody): Promise<Machine> {
+    return this._put(`${this.baseUrl}/machines/${id}`, params)
   }
 
-  createBooking (id: string, from: DateTimeObject, to: DateTimeObject) {
-    return this._post(`${this.baseUrl}/api/machines/${id}/bookings`, {from, to})
+  createBooking (id: string, body: CreateBookingBody): Promise<Booking> {
+    return this._post(`${this.baseUrl}/machines/${id}/bookings`, body)
   }
 }
 
-class TokenSdk extends ResourceSdk {
+class TokenSdk extends ResourceSdk<Token> {
   constructor (sdk: Sdk) {
     super('tokens', sdk)
   }
 
-  /**
-   * Creates a token
-   * @param {String} name
-   */
-  createToken (name: string) {
-    return this
-      ._post(`${this.baseUrl}/api/tokens`, {name})
-      .then(({body}) => body)
+  async createToken (b: CreateTokenBody): Promise<TokenWithSecret> {
+    const res = await this._post(`${this.baseUrl}/tokens`, b)
+    return res.body
   }
 
-  /**
-   * @param {string} name
-   * @param {string} email
-   * @param {string} password
-   */
-  createTokenFromEmailPassword (name: string, email: string, password: string) {
-    return this
-      ._post(`${this.baseUrl}/api/tokens/email-password`, {name, email, password})
-      .then(({body}) => body)
+  async createTokenFromEmailPassword (b: CreateTokenFromEmailPasswordBody): Promise<Token> {
+    const res = await this._post(`${this.baseUrl}/tokens/email-password`, b)
+    return res.body
   }
 }
 
-class LaundrySdk extends ResourceSdk {
+class LaundrySdk extends ResourceSdk<Laundry> {
   constructor (sdk: Sdk) {
     super('laundries', sdk)
   }
 
-  createLaundry (name: string, googlePlaceId: string) {
-    return this._post(`${this.baseUrl}/api/laundries`, {name, googlePlaceId})
-      .then(response => response.body || null)
+  async createLaundry (b: CreateLaundryBody): Promise<Laundry> {
+    const res = await this._post(`${this.baseUrl}/laundries`, b)
+    return res.body
   }
 
   /**
    * Create a demo landry
    * @returns {Promise.<{email: string, password: string}>}
    */
-  createDemoLaundry () {
-    return this._post(`${this.baseUrl}/api/laundries/demo`)
-      .then(({body}) => body)
+  async createDemoLaundry (): Promise<CreateDemoLaundryResult> {
+    const res = await this._post(`${this.baseUrl}/laundries/demo`)
+    return res.body
   }
 
-  updateLaundry (id: string, params: LaundryModifier) {
-    return this._put(`${this.baseUrl}/api/laundries/${id}`, params)
+  async updateLaundry (id: string, params: UpdateLaundryBody): Promise<Laundry> {
+    const res = await this._put(`${this.baseUrl}/laundries/${id}`, params)
+    return res.body
   }
 
-  createMachine (id: string, name: string, type: LaundryType, broken: boolean) {
-    return this._post(`${this.baseUrl}/api/laundries/${id}/machines`, {name, type, broken})
+  async createMachine (id: string, b: CreateMachineBody): Promise<Machine> {
+    const res = await this._post(`${this.baseUrl}/laundries/${id}/machines`, b)
+    return res.body
   }
 
-  inviteUserByEmail (id: string, email: string) {
-    return this._post(`${this.baseUrl}/api/laundries/${id}/invite-by-email`, {email})
+  async inviteUserByEmail (id: string, b: InviteUserByEmailBody): Promise<void> {
+    await this._post(`${this.baseUrl}/laundries/${id}/invite-by-email`, b)
   }
 
-  removeUserFromLaundry (id: string, userId: string) {
-    return this._del(`${this.baseUrl}/api/laundries/${id}/users/${userId}`)
+  async removeUserFromLaundry (id: string, userId: string): Promise<void> {
+    return this._del(`${this.baseUrl}/laundries/${id}/users/${userId}`)
   }
 
-  createInviteCode (id: string) {
-    return this._post(`${this.baseUrl}/api/laundries/${id}/invite-code`).then(({body}) => body)
+  async createInviteCode (id: string): Promise<CreateInviteCodeResult> {
+    const res = await this._post(`${this.baseUrl}/laundries/${id}/invite-code`)
+    return res.body
   }
 
-  addOwner (id: string, userId: string) {
-    return this._post(`${this.baseUrl}/api/laundries/${id}/owners/${userId}`)
+  async verifyInviteCode (id: string, b: VerifyInviteCodeBody): Promise<void> {
+    await this._post(`${this.baseUrl}/laundries/${id}/verify-invite-code`, b)
   }
 
-  removeOwner (id: string, userId: string) {
-    return this._del(`${this.baseUrl}/api/laundries/${id}/owners/${userId}`)
+  async addOwner (id: string, userId: string): Promise<void> {
+    await this._post(`${this.baseUrl}/laundries/${id}/owners/${userId}`)
+  }
+  async addUser (id: string, userId: string): Promise<void> {
+    await this._post(`${this.baseUrl}/laundries/${id}/users/${userId}`)
+  }
+  async removeOwner (id: string, userId: string): Promise<void> {
+    await this._del(`${this.baseUrl}/laundries/${id}/owners/${userId}`)
   }
 
-  addFromCode (id: string, code: string) {
-    return this._post(`${this.baseUrl}/api/laundries/${id}/users/add-from-code`, {key: code})
+  async addFromCode (id: string, b: AddUserFromCodeBody): Promise<void> {
+    await this._post(`${this.baseUrl}/laundries/${id}/users/add-from-code`, b)
   }
 }
 
@@ -406,23 +531,24 @@ class ContactSdk extends ResourceSdk {
     super('contact', sdk)
   }
 
-  sendMessage ({name, email, subject, message}: { name?: string, email?: string, subject: string, message: string }) {
-    return this._post(this.baseUrl + '/api/contact', {name, email, subject, message})
+  async sendMessage (b: ContactBody): Promise<void> {
+    await this._post(this.baseUrl + '/contact', b)
   }
 }
 
-class InviteSdk extends ResourceSdk {
+class InviteSdk extends ResourceSdk<LaundryInvitation> {
   constructor (sdk: Sdk) {
     super('invites', sdk)
   }
 }
 
-class BookingSdk extends ResourceSdk {
+class BookingSdk extends ResourceSdk<Booking> {
   constructor (sdk: Sdk) {
     super('bookings', sdk)
   }
 
-  updateBooking (id: string, dates: BookingModifier) {
-    return this._put(`${this.baseUrl}/api/bookings/${id}`, dates)
+  async updateBooking (id: string, dates: UpdateBookingBody): Promise<Booking> {
+    const res = await this._put(`${this.baseUrl}/bookings/${id}`, dates)
+    return res.body
   }
 }

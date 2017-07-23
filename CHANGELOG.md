@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add API types and more functionality
+
 ## [0.1.5]
 
 - Fix wrong endpoint

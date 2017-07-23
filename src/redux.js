@@ -1,5 +1,12 @@
 // @flow
 import { combineReducers } from 'redux'
+import type { MachineType as MT, UserRole as UR, LaundryRules as LR, Time as T } from './types'
+
+export type MachineType = MT
+export type UserRole = UR
+export type Time = T
+
+export type LaundryRules = LR
 
 const SIGN_IN_USER = 'SIGN_IN_USER'
 const LIST_LAUNDRIES = 'LIST_LAUNDRIES'
@@ -26,25 +33,12 @@ const UPDATE_STATS = 'UPDATE_STATS'
 const FINISH_JOB = 'FINISH_JOB'
 const CONFIGURE = 'CONFIGURE'
 
-export type MachineType = 'wash' | 'dry'
-
 export type Machine = {|
   id: string,
   type: MachineType,
   name: string,
   broken: boolean
 |}
-
-export type Time = { hour: number, minute: number }
-
-export type LaundryRules = {
-  limit?: number,
-  dailyLimit?: number,
-  timeLimit?: {
-    from: Time,
-    to: Time
-  }
-}
 
 export type Laundry = {|
   id: string,
@@ -64,8 +58,8 @@ export type User = {|
   photo: string,
   displayName: string,
   laundries: string[],
-  lastSeen: string,
-  role: 'user' | 'admin',
+  lastSeen?: string,
+  role: UserRole,
   demo: boolean
 |}
 
@@ -279,6 +273,7 @@ function userList (s: string[] = [], a: Action): string[] {
       return s
   }
 }
+
 function laundryList (s: string[] = [], a: Action) {
   switch (a.type) {
     case LIST_LAUNDRIES:
@@ -335,6 +330,7 @@ function laundries (state: { [string]: Laundry } = {}, action: Action): { [strin
       return state
   }
 }
+
 function machines (state: { [string]: Machine } = {}, action: Action): { [string]: Machine } {
   switch (action.type) {
     case UPDATE_MACHINE:
@@ -408,7 +404,7 @@ function userBookings (state: ?{ bookings: string[], user: string } = null, acti
   }
 }
 
-export const reducer:(State, Action) => State = combineReducers({
+export const reducer: (State, Action) => State = combineReducers({
   users,
   userList,
   currentUser,
