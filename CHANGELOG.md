@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.2.0-beta.0]
+
 - Add API types and more functionality
 
 ## [0.1.5]
