@@ -18,7 +18,7 @@ type Socket = {
   emit: () => void
 }
 
-type Summary = { id: string, href: string }
+export type Summary = { id: string, href: string }
 
 export type User = {|
   id: string,
@@ -127,7 +127,11 @@ export type CreateMachineBody = { broken: boolean, type: MachineType, name: stri
 
 export type UpdateMachineBody = { broken?: boolean, type?: MachineType, name?: string }
 
-export type CreateTokenBody = { name: string }
+export type TokenType = 'auth' | 'calendar'
+
+export type CreateTokenBody = { name: string, type: TokenType }
+
+export type VerifyTokenBody = { token: string, type: TokenType }
 
 export type CreateTokenFromEmailPasswordBody = { name: string, email: string, password: string }
 
@@ -356,6 +360,15 @@ class UserSdk extends ResourceSdk<User> {
     super('users', sdk)
   }
 
+  async createToken (userId: string, b: CreateTokenBody): Promise<TokenWithSecret> {
+    const res = await this._post(`${this.baseUrl}/users/${userId}/tokens`, b)
+    return res.body
+  }
+
+  async verifyToken (userId: string, b: VerifyTokenBody): Promise<void> {
+    await this._post(`${this.baseUrl}/users/${userId}/tokens/verify`, b)
+  }
+
   async verifyEmail (id: string, b: VerifyEmailBody): Promise<void> {
     await this._post(`${this.baseUrl}/users/${id}/verify-email`, b)
   }
@@ -452,11 +465,6 @@ class MachineSdk extends ResourceSdk<Machine> {
 class TokenSdk extends ResourceSdk<Token> {
   constructor (sdk: Sdk) {
     super('tokens', sdk)
-  }
-
-  async createToken (b: CreateTokenBody): Promise<TokenWithSecret> {
-    const res = await this._post(`${this.baseUrl}/tokens`, b)
-    return res.body
   }
 
   async createTokenFromEmailPassword (b: CreateTokenFromEmailPasswordBody): Promise<Token> {
