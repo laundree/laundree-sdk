@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Fix deployment
+- Upgrade flow 
+
 ## [0.2.0]
 
 - Add API types and more functionality
