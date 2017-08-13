@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.2.1]
+
 - Fix deployment
 - Upgrade flow 
 
