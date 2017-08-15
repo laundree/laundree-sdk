@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.2.2]
+
 - Refactor baseUrl
 
 ## [0.2.1]
