@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Refactor baseUrl
+
 ## [0.2.1]
 
 - Fix deployment

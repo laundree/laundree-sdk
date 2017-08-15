@@ -199,7 +199,6 @@ export class Sdk {
     contact: ContactSdk
   }
   baseUrl: string
-  jobEventEmitter: EventEmitter
   socket: any
   jobEventEmitter = new EventEmitter()
   authenticator: Authenticator
@@ -284,7 +283,7 @@ export class Sdk {
   }
 
   async _req (method: 'get' | 'post' | 'put' | 'delete', path: string, data: ?{} = null) {
-    let req = request[method](path)
+    let req = request[method](`${this.baseUrl}${path}`)
     const authStrategy = await this.authenticator()
     switch (authStrategy.type) {
       case 'unauthenticated':
@@ -321,12 +320,10 @@ export class Sdk {
 class ResourceSdk<R: Resource> {
   sdk: Sdk
   resourcePath: string
-  baseUrl: string
 
   constructor (resourcePath: string, sdk: Sdk) {
     this.resourcePath = resourcePath
     this.sdk = sdk
-    this.baseUrl = this.sdk.baseUrl
   }
 
   _get (path) {
@@ -346,12 +343,12 @@ class ResourceSdk<R: Resource> {
   }
 
   async get (id: string): Promise<R> {
-    const res = await this.sdk._get(`${this.baseUrl}/${this.resourcePath}/${id}`)
+    const res = await this.sdk._get(`/${this.resourcePath}/${id}`)
     return res.body
   }
 
   async del (id: string) {
-    await this.sdk._del(`${this.baseUrl}/${this.resourcePath}/${id}`)
+    await this.sdk._del(`/${this.resourcePath}/${id}`)
   }
 }
 
@@ -361,37 +358,37 @@ class UserSdk extends ResourceSdk<User> {
   }
 
   async createToken (userId: string, b: CreateTokenBody): Promise<TokenWithSecret> {
-    const res = await this._post(`${this.baseUrl}/users/${userId}/tokens`, b)
+    const res = await this._post(`/users/${userId}/tokens`, b)
     return res.body
   }
 
   async verifyToken (userId: string, b: VerifyTokenBody): Promise<void> {
-    await this._post(`${this.baseUrl}/users/${userId}/tokens/verify`, b)
+    await this._post(`/users/${userId}/tokens/verify`, b)
   }
 
   async verifyEmail (id: string, b: VerifyEmailBody): Promise<void> {
-    await this._post(`${this.baseUrl}/users/${id}/verify-email`, b)
+    await this._post(`/users/${id}/verify-email`, b)
   }
 
   async validateCredentials (b: ValidateCredentialsBody): Promise<ValidateCredentialsResult> {
-    const res = await this._post(`${this.baseUrl}/users/validate-credentials`, b)
+    const res = await this._post(`/users/validate-credentials`, b)
     return res.body
   }
 
   async createUserFromProfile (b: CreateUserFromProfileBody): Promise<User> {
-    const res = await this._post(`${this.baseUrl}/users/profile`, b)
+    const res = await this._post(`/users/profile`, b)
     return res.body
   }
 
   async fromEmail (email: string): Promise<?User> {
-    const {body} = await this._get(`${this.baseUrl}/users?email=${encodeURIComponent(email)}`)
+    const {body} = await this._get(`/users?email=${encodeURIComponent(email)}`)
     if (!body) return null
     if (body.length !== 1) return null
     return body[0]
   }
 
   async createUser (b: CreateUserBody): Promise<User> {
-    const {body} = await this._post(`${this.baseUrl}/users`, b)
+    const {body} = await this._post(`/users`, b)
     return body
   }
 
@@ -418,33 +415,33 @@ class UserSdk extends ResourceSdk<User> {
   }
 
   async resetPassword (id: string, body: PasswordResetBody): Promise<void> {
-    return this._post(`${this.baseUrl}/users/${id}/password-reset`, body)
+    return this._post(`/users/${id}/password-reset`, body)
   }
 
   async listEmails (id: string): Promise<string[]> {
-    const res = await this._get(`${this.baseUrl}/users/${id}/emails`)
+    const res = await this._get(`/users/${id}/emails`)
     return res.body
   }
 
   async addOneSignalPlayerId (id: string, body: AddOneSignalPlayerIdBody): Promise<void> {
-    await this._post(`${this.baseUrl}/users/${id}/one-signal-player-ids`, body)
+    await this._post(`/users/${id}/one-signal-player-ids`, body)
   }
 
   async updateUser (id: string, body: UpdateUserBody): Promise<User> {
-    const {body: b} = await this._put(`${this.baseUrl}/users/${id}`, body)
+    const {body: b} = await this._put(`/users/${id}`, body)
     return b
   }
 
   async changePassword (id: string, body: ChangeUserPasswordBody): Promise<void> {
-    await this._post(`${this.baseUrl}/users/${id}/password-change`, body)
+    await this._post(`/users/${id}/password-change`, body)
   }
 
   async startPasswordReset (id: string, b?: StartPasswordResetBody): Promise<void> {
-    await this._post(`${this.baseUrl}/users/${id}/start-password-reset`, b)
+    await this._post(`/users/${id}/start-password-reset`, b)
   }
 
   async _startEmailVerification (id: string, body: StartEmailVerificationBody): Promise<void> {
-    await this._post(`${this.baseUrl}/users/${id}/start-email-verification`, body)
+    await this._post(`/users/${id}/start-email-verification`, body)
   }
 }
 
@@ -454,11 +451,11 @@ class MachineSdk extends ResourceSdk<Machine> {
   }
 
   updateMachine (id: string, params: UpdateMachineBody): Promise<Machine> {
-    return this._put(`${this.baseUrl}/machines/${id}`, params)
+    return this._put(`/machines/${id}`, params)
   }
 
   createBooking (id: string, body: CreateBookingBody): Promise<Booking> {
-    return this._post(`${this.baseUrl}/machines/${id}/bookings`, body)
+    return this._post(`/machines/${id}/bookings`, body)
   }
 }
 
@@ -468,7 +465,7 @@ class TokenSdk extends ResourceSdk<Token> {
   }
 
   async createTokenFromEmailPassword (b: CreateTokenFromEmailPasswordBody): Promise<Token> {
-    const res = await this._post(`${this.baseUrl}/tokens/email-password`, b)
+    const res = await this._post(`/tokens/email-password`, b)
     return res.body
   }
 }
@@ -479,7 +476,7 @@ class LaundrySdk extends ResourceSdk<Laundry> {
   }
 
   async createLaundry (b: CreateLaundryBody): Promise<Laundry> {
-    const res = await this._post(`${this.baseUrl}/laundries`, b)
+    const res = await this._post(`/laundries`, b)
     return res.body
   }
 
@@ -488,49 +485,49 @@ class LaundrySdk extends ResourceSdk<Laundry> {
    * @returns {Promise.<{email: string, password: string}>}
    */
   async createDemoLaundry (): Promise<CreateDemoLaundryResult> {
-    const res = await this._post(`${this.baseUrl}/laundries/demo`)
+    const res = await this._post(`/laundries/demo`)
     return res.body
   }
 
   async updateLaundry (id: string, params: UpdateLaundryBody): Promise<Laundry> {
-    const res = await this._put(`${this.baseUrl}/laundries/${id}`, params)
+    const res = await this._put(`/laundries/${id}`, params)
     return res.body
   }
 
   async createMachine (id: string, b: CreateMachineBody): Promise<Machine> {
-    const res = await this._post(`${this.baseUrl}/laundries/${id}/machines`, b)
+    const res = await this._post(`/laundries/${id}/machines`, b)
     return res.body
   }
 
   async inviteUserByEmail (id: string, b: InviteUserByEmailBody): Promise<void> {
-    await this._post(`${this.baseUrl}/laundries/${id}/invite-by-email`, b)
+    await this._post(`/laundries/${id}/invite-by-email`, b)
   }
 
   async removeUserFromLaundry (id: string, userId: string): Promise<void> {
-    return this._del(`${this.baseUrl}/laundries/${id}/users/${userId}`)
+    return this._del(`/laundries/${id}/users/${userId}`)
   }
 
   async createInviteCode (id: string): Promise<CreateInviteCodeResult> {
-    const res = await this._post(`${this.baseUrl}/laundries/${id}/invite-code`)
+    const res = await this._post(`/laundries/${id}/invite-code`)
     return res.body
   }
 
   async verifyInviteCode (id: string, b: VerifyInviteCodeBody): Promise<void> {
-    await this._post(`${this.baseUrl}/laundries/${id}/verify-invite-code`, b)
+    await this._post(`/laundries/${id}/verify-invite-code`, b)
   }
 
   async addOwner (id: string, userId: string): Promise<void> {
-    await this._post(`${this.baseUrl}/laundries/${id}/owners/${userId}`)
+    await this._post(`/laundries/${id}/owners/${userId}`)
   }
   async addUser (id: string, userId: string): Promise<void> {
-    await this._post(`${this.baseUrl}/laundries/${id}/users/${userId}`)
+    await this._post(`/laundries/${id}/users/${userId}`)
   }
   async removeOwner (id: string, userId: string): Promise<void> {
-    await this._del(`${this.baseUrl}/laundries/${id}/owners/${userId}`)
+    await this._del(`/laundries/${id}/owners/${userId}`)
   }
 
   async addFromCode (id: string, b: AddUserFromCodeBody): Promise<void> {
-    await this._post(`${this.baseUrl}/laundries/${id}/users/add-from-code`, b)
+    await this._post(`/laundries/${id}/users/add-from-code`, b)
   }
 }
 
@@ -540,7 +537,7 @@ class ContactSdk extends ResourceSdk {
   }
 
   async sendMessage (b: ContactBody): Promise<void> {
-    await this._post(this.baseUrl + '/contact', b)
+    await this._post('/contact', b)
   }
 }
 
@@ -556,7 +553,7 @@ class BookingSdk extends ResourceSdk<Booking> {
   }
 
   async updateBooking (id: string, dates: UpdateBookingBody): Promise<Booking> {
-    const res = await this._put(`${this.baseUrl}/bookings/${id}`, dates)
+    const res = await this._put(`/bookings/${id}`, dates)
     return res.body
   }
 }
