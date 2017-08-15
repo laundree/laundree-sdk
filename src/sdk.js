@@ -371,12 +371,12 @@ class UserSdk extends ResourceSdk<User> {
   }
 
   async validateCredentials (b: ValidateCredentialsBody): Promise<ValidateCredentialsResult> {
-    const res = await this._post(`/users/validate-credentials`, b)
+    const res = await this._post('/users/validate-credentials', b)
     return res.body
   }
 
   async createUserFromProfile (b: CreateUserFromProfileBody): Promise<User> {
-    const res = await this._post(`/users/profile`, b)
+    const res = await this._post('/users/profile', b)
     return res.body
   }
 
@@ -388,7 +388,7 @@ class UserSdk extends ResourceSdk<User> {
   }
 
   async createUser (b: CreateUserBody): Promise<User> {
-    const {body} = await this._post(`/users`, b)
+    const {body} = await this._post('/users', b)
     return body
   }
 
@@ -465,7 +465,7 @@ class TokenSdk extends ResourceSdk<Token> {
   }
 
   async createTokenFromEmailPassword (b: CreateTokenFromEmailPasswordBody): Promise<Token> {
-    const res = await this._post(`/tokens/email-password`, b)
+    const res = await this._post('/tokens/email-password', b)
     return res.body
   }
 }
@@ -476,7 +476,7 @@ class LaundrySdk extends ResourceSdk<Laundry> {
   }
 
   async createLaundry (b: CreateLaundryBody): Promise<Laundry> {
-    const res = await this._post(`/laundries`, b)
+    const res = await this._post('/laundries', b)
     return res.body
   }
 
@@ -485,7 +485,7 @@ class LaundrySdk extends ResourceSdk<Laundry> {
    * @returns {Promise.<{email: string, password: string}>}
    */
   async createDemoLaundry (): Promise<CreateDemoLaundryResult> {
-    const res = await this._post(`/laundries/demo`)
+    const res = await this._post('/laundries/demo')
     return res.body
   }
 
@@ -519,9 +519,11 @@ class LaundrySdk extends ResourceSdk<Laundry> {
   async addOwner (id: string, userId: string): Promise<void> {
     await this._post(`/laundries/${id}/owners/${userId}`)
   }
+
   async addUser (id: string, userId: string): Promise<void> {
     await this._post(`/laundries/${id}/users/${userId}`)
   }
+
   async removeOwner (id: string, userId: string): Promise<void> {
     await this._del(`/laundries/${id}/owners/${userId}`)
   }

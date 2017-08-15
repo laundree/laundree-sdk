@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix errors
+
 ## [0.2.2]
 
 - Refactor baseUrl
