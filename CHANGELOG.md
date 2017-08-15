@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.2.3]
+
 - Fix errors
 
 ## [0.2.2]
