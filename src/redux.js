@@ -70,8 +70,44 @@ export type Booking = {|
   to: string,
   machine: string
 |}
+export type Stats = {|
+  demoLaundryCount: number,
+  demoUserCount: number,
+  laundryCount: number,
+  userCount: number,
+  bookingCount: number,
+  machineCount: number
+|}
+
+export type Flash = {|
+  type: string,
+  message: string
+|}
+
+export type Invite = {|
+  id: string,
+  used: boolean,
+  email: string,
+  laundry: string
+|}
 
 export type Config = {}
+
+export type State = {|
+  users: { [string]: User },
+  userList: string[],
+  currentUser: ?string,
+  flash: Flash[],
+  laundries: { [string]: Laundry },
+  laundryList: string[],
+  machines: { [string]: Machine },
+  bookings: { [string]: Booking },
+  userBookings: ?{ bookings: string[], user: string },
+  invites: { [string]: Invite },
+  stats: ?Stats,
+  job: ?number,
+  config: Config
+|}
 
 export type ListMachinesAction = {
   type: 'LIST_MACHINES',
@@ -190,43 +226,6 @@ export type ListBookingsForUserAction = {
   type: 'LIST_BOOKINGS_FOR_USER',
   payload: { bookings: Booking[], user: string }
 }
-
-export type Stats = {|
-  demoLaundryCount: number,
-  demoUserCount: number,
-  laundryCount: number,
-  userCount: number,
-  bookingCount: number,
-  machineCount: number
-|}
-
-export type Flash = {|
-  type: string,
-  message: string
-|}
-
-export type Invite = {|
-  id: string,
-  used: boolean,
-  email: string,
-  laundry: string
-|}
-
-export type State = {|
-  users: { [string]: User },
-  userList: string[],
-  currentUser: ?string,
-  flash: Flash[],
-  laundries: { [string]: Laundry },
-  laundryList: string[],
-  machines: { [string]: Machine },
-  bookings: { [string]: Booking },
-  userBookings: ?{ bookings: string[], user: string },
-  invites: { [string]: Invite },
-  stats: ?Stats,
-  job: ?number,
-  config: Config
-|}
 
 export type Action = ListMachinesAction
   | CreateMachineAction

@@ -14,8 +14,22 @@ export type LaundryRules = LR
 
 let jobId = 1
 
+type Name = {
+  familyName?: string,
+  givenName?: string,
+  middleName?: string
+}
+
 type Socket = {
   emit: () => void
+}
+
+export type DateTimeObject = {
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute: number
 }
 
 export type Summary = { id: string, href: string }
@@ -153,12 +167,6 @@ export type ValidateCredentialsBody = { email: string, password: string }
 
 export type VerifyInviteCodeBody = { key: string }
 
-type Name = {
-  familyName?: string,
-  givenName?: string,
-  middleName?: string
-}
-
 export type CreateUserFromProfileBody = {
   provider: string,
   id: string,
@@ -166,14 +174,6 @@ export type CreateUserFromProfileBody = {
   name: Name,
   emails: { value: string, type?: string }[],
   photos?: { value: string }[]
-}
-
-export type DateTimeObject = {
-  year: number,
-  month: number,
-  day: number,
-  hour: number,
-  minute: number
 }
 
 export type DateObject = {
@@ -228,7 +228,7 @@ export class Sdk {
     })
   }
 
-  emit (action: string, ...args: mixed[]) {
+  emit (action: string, ...args: mixed[]): Promise<void> {
     const jId = jobId++
     const opts = {jobId: jId}
     const newArgs = [action, opts].concat(args)
@@ -317,7 +317,7 @@ export class Sdk {
   }
 }
 
-class ResourceSdk<R: Resource> {
+class ResourceSdk<R: Resource | void = void> {
   sdk: Sdk
   resourcePath: string
 

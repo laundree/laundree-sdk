@@ -4,7 +4,7 @@
   "description": "An sdk for laundree.io",
   "main": "lib/index.js",
   "scripts": {
-    "prepublish": "npm run build",
+    "prepublishOnly": "npm run build",
     "test": "eslint . && flow",
     "build": "babel src -d lib --copy-files && flow-copy-source src lib"
   },
@@ -35,14 +35,14 @@
     "babel-preset-flow": "^6.23.0",
     "babel-preset-stage-0": "^6.24.1",
     "escope": "^3.6.0",
-    "eslint": "^4.1.1",
+    "eslint": "^3.19.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-config-standard-flow": "^1.0.1",
     "eslint-plugin-import": "^2.6.1",
     "eslint-plugin-node": "^5.1.0",
     "eslint-plugin-promise": "^3.0.0",
     "eslint-plugin-standard": "^3.0.1",
-    "flow-bin": "^0.52.0",
+    "flow-bin": "^0.54.0",
     "flow-copy-source": "^1.1.0"
   }
 }
