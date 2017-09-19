@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.2.4]
+
 - Update flow
 
 ## [0.2.3]
