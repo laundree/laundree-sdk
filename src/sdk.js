@@ -123,7 +123,9 @@ export type CreateBookingBody = { from: DateTimeObject, to: DateTimeObject }
 
 export type UpdateBookingBody = { from?: DateTimeObject, to?: DateTimeObject }
 
-export type ContactBody = { message: string, subject: string, name?: string, email?: string, locale?: LocaleType }
+export type ContactBody = { message: string, subject: string, name: string, email: string, locale?: LocaleType }
+
+export type ContactSupportBody = { message: string, subject: string, locale?: LocaleType }
 
 export type CreateLaundryBody = { name: string, googlePlaceId: string }
 
@@ -540,6 +542,10 @@ class ContactSdk extends ResourceSdk {
 
   async sendMessage (b: ContactBody): Promise<void> {
     await this._post('/contact', b)
+  }
+
+  async sendSupportMessage (b: ContactSupportBody): Promise<void> {
+    await this._post('/contact/support', b)
   }
 }
 

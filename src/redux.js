@@ -403,7 +403,7 @@ function userBookings (state: ?{ bookings: string[], user: string } = null, acti
   }
 }
 
-export const reducer: (s: State, a: Action) => State = combineReducers({
+export const reducer = combineReducers({
   users,
   userList,
   currentUser,

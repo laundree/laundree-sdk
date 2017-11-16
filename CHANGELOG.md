@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Update flow
+- Add new contact endpoint
+
 ## [0.2.4]
 
 - Update flow
