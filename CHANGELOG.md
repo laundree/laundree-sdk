@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add `LaundryAndUser` to `ApiResult`
+
 ## [0.3.1]
 
 - Add new create user endpoint

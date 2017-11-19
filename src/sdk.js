@@ -114,9 +114,15 @@ export type CreateDemoLaundryResult = {| email: string, password: string |}
 
 export type CreateInviteCodeResult = {| key: string, href: string |}
 
+export type LaundryAndUser = {
+  laundry: Laundry,
+  user: User
+}
+
 export type ApiResult =
   Resource
   | TokenWithSecret
+  | LaundryAndUser
   | ValidateCredentialsResult
   | CreateDemoLaundryResult
   | CreateInviteCodeResult
@@ -150,11 +156,6 @@ export type CreateUserWithLaundryBody = {
   displayName: string,
   email: string,
   password: string
-}
-
-export type LaundryAndUser = {
-  laundry: Laundry,
-  user: User
 }
 
 export type AddUserFromCodeBody = { key: string }
