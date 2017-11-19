@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add new create user endpoint
+- Add new statistics endpoint
+
 ## [0.3.0]
 
 - Update flow

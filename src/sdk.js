@@ -55,6 +55,13 @@ export type Booking = {|
   to: DateTimeObject
 |}
 
+export type Statistics = {|
+  laundryCount: number,
+  userCount: number,
+  bookingCount: number,
+  machineCount: number
+|}
+
 export type Token = {|
   id: string,
   href: string,
@@ -137,6 +144,19 @@ export type UpdateLaundryBody = {
   rules?: LaundryRules
 }
 
+export type CreateUserWithLaundryBody = {
+  name: string,
+  googlePlaceId: string,
+  displayName: string,
+  email: string,
+  password: string
+}
+
+export type LaundryAndUser = {
+  laundry: Laundry,
+  user: User
+}
+
 export type AddUserFromCodeBody = { key: string }
 
 export type CreateMachineBody = { broken: boolean, type: MachineType, name: string }
@@ -198,7 +218,8 @@ export class Sdk {
     invite: InviteSdk,
     booking: BookingSdk,
     token: TokenSdk,
-    contact: ContactSdk
+    contact: ContactSdk,
+    statistics: StatisticSdk
   }
   baseUrl: string
   socket: any
@@ -213,6 +234,7 @@ export class Sdk {
       laundry: new LaundrySdk(this),
       invite: new InviteSdk(this),
       booking: new BookingSdk(this),
+      statistics: new StatisticSdk(this),
       token: new TokenSdk(this),
       contact: new ContactSdk(this)
     }
@@ -319,12 +341,10 @@ export class Sdk {
   }
 }
 
-class ResourceSdk<R: Resource | void = void> {
+class S {
   sdk: Sdk
-  resourcePath: string
 
-  constructor (resourcePath: string, sdk: Sdk) {
-    this.resourcePath = resourcePath
+  constructor (sdk: Sdk) {
     this.sdk = sdk
   }
 
@@ -342,6 +362,15 @@ class ResourceSdk<R: Resource | void = void> {
 
   _post (path, data) {
     return this.sdk._post(path, data)
+  }
+}
+
+class ResourceSdk<R: Resource> extends S {
+  resourcePath: string
+
+  constructor (resourcePath: string, sdk: Sdk) {
+    super(sdk)
+    this.resourcePath = resourcePath
   }
 
   async get (id: string): Promise<R> {
@@ -380,6 +409,10 @@ class UserSdk extends ResourceSdk<User> {
   async createUserFromProfile (b: CreateUserFromProfileBody): Promise<User> {
     const res = await this._post('/users/profile', b)
     return res.body
+  }
+
+  async createUserWithLaundry (b: CreateUserWithLaundryBody): Promise<LaundryAndUser> {
+    return (await this._post('/users/with-laundry', b)).body
   }
 
   async fromEmail (email: string): Promise<?User> {
@@ -535,11 +568,7 @@ class LaundrySdk extends ResourceSdk<Laundry> {
   }
 }
 
-class ContactSdk extends ResourceSdk {
-  constructor (sdk: Sdk) {
-    super('contact', sdk)
-  }
-
+class ContactSdk extends S {
   async sendMessage (b: ContactBody): Promise<void> {
     await this._post('/contact', b)
   }
@@ -563,5 +592,12 @@ class BookingSdk extends ResourceSdk<Booking> {
   async updateBooking (id: string, dates: UpdateBookingBody): Promise<Booking> {
     const res = await this._put(`/bookings/${id}`, dates)
     return res.body
+  }
+}
+
+class StatisticSdk extends S {
+
+  async fetchStatistics (): Promise<Statistics> {
+    return (await this._get('/statistics')).body
   }
 }
