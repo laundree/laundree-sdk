@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.3.1]
+
 - Add new create user endpoint
 - Add new statistics endpoint
 
