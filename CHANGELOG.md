@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add `Statistics` to `ApiResult`
+
 ## [0.3.2]
 
 - Add `LaundryAndUser` to `ApiResult`

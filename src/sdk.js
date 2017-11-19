@@ -121,6 +121,7 @@ export type LaundryAndUser = {
 
 export type ApiResult =
   Resource
+  | Statistics
   | TokenWithSecret
   | LaundryAndUser
   | ValidateCredentialsResult
