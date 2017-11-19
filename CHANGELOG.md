@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.3.3]
+
 - Add `Statistics` to `ApiResult`
 
 ## [0.3.2]
