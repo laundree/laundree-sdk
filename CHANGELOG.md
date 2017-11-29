@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fixed flow
+
 ## [0.3.3]
 
 - Add `Statistics` to `ApiResult`

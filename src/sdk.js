@@ -326,19 +326,19 @@ export class Sdk {
     return req.send(data)
   }
 
-  _post (path: string, data: ?{} = null) {
+  postRequest (path: string, data: ?{} = null) {
     return this._req('post', path, data)
   }
 
-  _del (path: string) {
+  deleteRequest (path: string) {
     return this._req('delete', path)
   }
 
-  _put (path: string, data: ?{} = null) {
+  putRequest (path: string, data: ?{} = null) {
     return this._req('put', path, data)
   }
 
-  _get (path: string) {
+  getRequest (path: string) {
     return this._req('get', path)
   }
 }
@@ -350,20 +350,20 @@ class S {
     this.sdk = sdk
   }
 
-  _get (path) {
-    return this.sdk._get(path)
+  getRequest (path) {
+    return this.sdk.getRequest(path)
   }
 
-  _del (path) {
-    return this.sdk._del(path)
+  deleteRequest (path) {
+    return this.sdk.deleteRequest(path)
   }
 
-  _put (path, data) {
-    return this.sdk._put(path, data)
+  putRequest (path, data) {
+    return this.sdk.putRequest(path, data)
   }
 
-  _post (path, data) {
-    return this.sdk._post(path, data)
+  postRequest (path, data) {
+    return this.sdk.postRequest(path, data)
   }
 }
 
@@ -376,12 +376,12 @@ class ResourceSdk<R: Resource> extends S {
   }
 
   async get (id: string): Promise<R> {
-    const res = await this.sdk._get(`/${this.resourcePath}/${id}`)
+    const res = await this.sdk.getRequest(`/${this.resourcePath}/${id}`)
     return res.body
   }
 
   async del (id: string) {
-    await this.sdk._del(`/${this.resourcePath}/${id}`)
+    await this.sdk.deleteRequest(`/${this.resourcePath}/${id}`)
   }
 }
 
@@ -391,41 +391,41 @@ class UserSdk extends ResourceSdk<User> {
   }
 
   async createToken (userId: string, b: CreateTokenBody): Promise<TokenWithSecret> {
-    const res = await this._post(`/users/${userId}/tokens`, b)
+    const res = await this.postRequest(`/users/${userId}/tokens`, b)
     return res.body
   }
 
   async verifyToken (userId: string, b: VerifyTokenBody): Promise<void> {
-    await this._post(`/users/${userId}/tokens/verify`, b)
+    await this.postRequest(`/users/${userId}/tokens/verify`, b)
   }
 
   async verifyEmail (id: string, b: VerifyEmailBody): Promise<void> {
-    await this._post(`/users/${id}/verify-email`, b)
+    await this.postRequest(`/users/${id}/verify-email`, b)
   }
 
   async validateCredentials (b: ValidateCredentialsBody): Promise<ValidateCredentialsResult> {
-    const res = await this._post('/users/validate-credentials', b)
+    const res = await this.postRequest('/users/validate-credentials', b)
     return res.body
   }
 
   async createUserFromProfile (b: CreateUserFromProfileBody): Promise<User> {
-    const res = await this._post('/users/profile', b)
+    const res = await this.postRequest('/users/profile', b)
     return res.body
   }
 
   async createUserWithLaundry (b: CreateUserWithLaundryBody): Promise<LaundryAndUser> {
-    return (await this._post('/users/with-laundry', b)).body
+    return (await this.postRequest('/users/with-laundry', b)).body
   }
 
   async fromEmail (email: string): Promise<?User> {
-    const {body} = await this._get(`/users?email=${encodeURIComponent(email)}`)
+    const {body} = await this.getRequest(`/users?email=${encodeURIComponent(email)}`)
     if (!body) return null
     if (body.length !== 1) return null
     return body[0]
   }
 
   async createUser (b: CreateUserBody): Promise<User> {
-    const {body} = await this._post('/users', b)
+    const {body} = await this.postRequest('/users', b)
     return body
   }
 
@@ -452,33 +452,33 @@ class UserSdk extends ResourceSdk<User> {
   }
 
   async resetPassword (id: string, body: PasswordResetBody): Promise<void> {
-    return this._post(`/users/${id}/password-reset`, body)
+    return this.postRequest(`/users/${id}/password-reset`, body)
   }
 
   async listEmails (id: string): Promise<string[]> {
-    const res = await this._get(`/users/${id}/emails`)
+    const res = await this.getRequest(`/users/${id}/emails`)
     return res.body
   }
 
   async addOneSignalPlayerId (id: string, body: AddOneSignalPlayerIdBody): Promise<void> {
-    await this._post(`/users/${id}/one-signal-player-ids`, body)
+    await this.postRequest(`/users/${id}/one-signal-player-ids`, body)
   }
 
   async updateUser (id: string, body: UpdateUserBody): Promise<User> {
-    const {body: b} = await this._put(`/users/${id}`, body)
+    const {body: b} = await this.putRequest(`/users/${id}`, body)
     return b
   }
 
   async changePassword (id: string, body: ChangeUserPasswordBody): Promise<void> {
-    await this._post(`/users/${id}/password-change`, body)
+    await this.postRequest(`/users/${id}/password-change`, body)
   }
 
   async startPasswordReset (id: string, b?: StartPasswordResetBody): Promise<void> {
-    await this._post(`/users/${id}/start-password-reset`, b)
+    await this.postRequest(`/users/${id}/start-password-reset`, b)
   }
 
   async _startEmailVerification (id: string, body: StartEmailVerificationBody): Promise<void> {
-    await this._post(`/users/${id}/start-email-verification`, body)
+    await this.postRequest(`/users/${id}/start-email-verification`, body)
   }
 }
 
@@ -488,11 +488,11 @@ class MachineSdk extends ResourceSdk<Machine> {
   }
 
   updateMachine (id: string, params: UpdateMachineBody): Promise<Machine> {
-    return this._put(`/machines/${id}`, params)
+    return this.putRequest(`/machines/${id}`, params)
   }
 
   createBooking (id: string, body: CreateBookingBody): Promise<Booking> {
-    return this._post(`/machines/${id}/bookings`, body)
+    return this.postRequest(`/machines/${id}/bookings`, body)
   }
 }
 
@@ -502,7 +502,7 @@ class TokenSdk extends ResourceSdk<Token> {
   }
 
   async createTokenFromEmailPassword (b: CreateTokenFromEmailPasswordBody): Promise<Token> {
-    const res = await this._post('/tokens/email-password', b)
+    const res = await this.postRequest('/tokens/email-password', b)
     return res.body
   }
 }
@@ -513,7 +513,7 @@ class LaundrySdk extends ResourceSdk<Laundry> {
   }
 
   async createLaundry (b: CreateLaundryBody): Promise<Laundry> {
-    const res = await this._post('/laundries', b)
+    const res = await this.postRequest('/laundries', b)
     return res.body
   }
 
@@ -522,61 +522,61 @@ class LaundrySdk extends ResourceSdk<Laundry> {
    * @returns {Promise.<{email: string, password: string}>}
    */
   async createDemoLaundry (): Promise<CreateDemoLaundryResult> {
-    const res = await this._post('/laundries/demo')
+    const res = await this.postRequest('/laundries/demo')
     return res.body
   }
 
   async updateLaundry (id: string, params: UpdateLaundryBody): Promise<Laundry> {
-    const res = await this._put(`/laundries/${id}`, params)
+    const res = await this.putRequest(`/laundries/${id}`, params)
     return res.body
   }
 
   async createMachine (id: string, b: CreateMachineBody): Promise<Machine> {
-    const res = await this._post(`/laundries/${id}/machines`, b)
+    const res = await this.postRequest(`/laundries/${id}/machines`, b)
     return res.body
   }
 
   async inviteUserByEmail (id: string, b: InviteUserByEmailBody): Promise<void> {
-    await this._post(`/laundries/${id}/invite-by-email`, b)
+    await this.postRequest(`/laundries/${id}/invite-by-email`, b)
   }
 
   async removeUserFromLaundry (id: string, userId: string): Promise<void> {
-    return this._del(`/laundries/${id}/users/${userId}`)
+    return this.deleteRequest(`/laundries/${id}/users/${userId}`)
   }
 
   async createInviteCode (id: string): Promise<CreateInviteCodeResult> {
-    const res = await this._post(`/laundries/${id}/invite-code`)
+    const res = await this.postRequest(`/laundries/${id}/invite-code`)
     return res.body
   }
 
   async verifyInviteCode (id: string, b: VerifyInviteCodeBody): Promise<void> {
-    await this._post(`/laundries/${id}/verify-invite-code`, b)
+    await this.postRequest(`/laundries/${id}/verify-invite-code`, b)
   }
 
   async addOwner (id: string, userId: string): Promise<void> {
-    await this._post(`/laundries/${id}/owners/${userId}`)
+    await this.postRequest(`/laundries/${id}/owners/${userId}`)
   }
 
   async addUser (id: string, userId: string): Promise<void> {
-    await this._post(`/laundries/${id}/users/${userId}`)
+    await this.postRequest(`/laundries/${id}/users/${userId}`)
   }
 
   async removeOwner (id: string, userId: string): Promise<void> {
-    await this._del(`/laundries/${id}/owners/${userId}`)
+    await this.deleteRequest(`/laundries/${id}/owners/${userId}`)
   }
 
   async addFromCode (id: string, b: AddUserFromCodeBody): Promise<void> {
-    await this._post(`/laundries/${id}/users/add-from-code`, b)
+    await this.postRequest(`/laundries/${id}/users/add-from-code`, b)
   }
 }
 
 class ContactSdk extends S {
   async sendMessage (b: ContactBody): Promise<void> {
-    await this._post('/contact', b)
+    await this.postRequest('/contact', b)
   }
 
   async sendSupportMessage (b: ContactSupportBody): Promise<void> {
-    await this._post('/contact/support', b)
+    await this.postRequest('/contact/support', b)
   }
 }
 
@@ -592,7 +592,7 @@ class BookingSdk extends ResourceSdk<Booking> {
   }
 
   async updateBooking (id: string, dates: UpdateBookingBody): Promise<Booking> {
-    const res = await this._put(`/bookings/${id}`, dates)
+    const res = await this.putRequest(`/bookings/${id}`, dates)
     return res.body
   }
 }
@@ -600,6 +600,6 @@ class BookingSdk extends ResourceSdk<Booking> {
 class StatisticSdk extends S {
 
   async fetchStatistics (): Promise<Statistics> {
-    return (await this._get('/statistics')).body
+    return (await this.getRequest('/statistics')).body
   }
 }
