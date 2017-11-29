@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.3.6]
+
 - Fixed wrong result type
 
 ## [0.3.5]
