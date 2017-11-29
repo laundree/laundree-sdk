@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.3.4]
+
 - Fixed flow
 
 ## [0.3.3]
