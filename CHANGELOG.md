@@ -1,7 +1,7 @@
 # Changelog
 
 ## Unreleased
-
+## [0.3.5]
 ## [0.3.4]
 
 - Fixed flow
@@ -39,7 +39,7 @@
 ## [0.2.1]
 
 - Fix deployment
-- Upgrade flow 
+- Upgrade flow
 
 ## [0.2.0]
 
