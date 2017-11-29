@@ -501,7 +501,7 @@ class TokenSdk extends ResourceSdk<Token> {
     super('tokens', sdk)
   }
 
-  async createTokenFromEmailPassword (b: CreateTokenFromEmailPasswordBody): Promise<Token> {
+  async createTokenFromEmailPassword (b: CreateTokenFromEmailPasswordBody): Promise<TokenWithSecret> {
     const res = await this.postRequest('/tokens/email-password', b)
     return res.body
   }

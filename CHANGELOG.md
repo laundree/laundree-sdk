@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+
+- Fixed wrong result type
+
 ## [0.3.5]
 ## [0.3.4]
 
