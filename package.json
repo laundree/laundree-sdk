@@ -27,7 +27,7 @@
   "homepage": "https://github.com/laundree/laundree-sdk#readme",
   "dependencies": {
     "redux": "^3.6.0",
-    "superagent": "^3.4.4"
+    "superagent": "^5.0.5"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
