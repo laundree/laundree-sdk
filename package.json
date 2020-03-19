@@ -42,7 +42,7 @@
     "eslint-plugin-node": "^5.1.0",
     "eslint-plugin-promise": "^3.0.0",
     "eslint-plugin-standard": "^3.0.1",
-    "flow-bin": "^0.59.0",
+    "flow-bin": "^0.121.0",
     "flow-copy-source": "^1.1.0"
   }
 }
